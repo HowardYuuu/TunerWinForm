@@ -141,10 +141,15 @@ namespace TunerAPP_V2
                 return (float)sampleRate / bestLag; // 根據延遲計算頻率
             }
 
-            return 0.0f; // 頻率偵測失敗時回傳 0
+            return 0.0f;
         }
 
-        // 根據頻率及音分判斷音名
+        /// <summary>
+        /// 根據頻率及音分判斷音名
+        /// </summary>
+        /// <param name="frequency">傳入頻率</param>
+        /// <param name="tuningIndicator">偏高/偏低/正確</param>
+        /// <returns></returns>
         private string GetNoteNameByCent(float frequency, out string tuningIndicator)
         {
             tuningIndicator = "●"; // 預設為正確音高
@@ -153,7 +158,7 @@ namespace TunerAPP_V2
                 float baseFrequency = note.Value; // 音名的基準頻率
                 for (int octave = 0; octave < 9; octave++)
                 {
-                    float diff = 1200 * (float)Math.Log(frequency / baseFrequency, 2); // 計算頻率差異 (cent)
+                    float diff = 1200 * (float)Math.Log(frequency / baseFrequency, 2); // 音分計算音程差公式
                     if (Math.Abs(diff) < 50) // 若頻率差異小於 50 cent
                     {
                         tuningIndicator = diff > 0 ? "↗" : (diff < 0 ? "↘" : "●"); // 判斷音高偏高或偏低
@@ -162,7 +167,7 @@ namespace TunerAPP_V2
                     baseFrequency *= 2; // 基頻翻倍 (下一個八度)
                 }
             }
-            return "超出範圍"; // 頻率超出可偵測範圍
+            return "超出範圍";
         }
 
         // 顯示頻率與音高資訊
