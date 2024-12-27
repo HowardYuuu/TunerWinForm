@@ -8,23 +8,23 @@ namespace TunerAPP_V2
 {
     public partial class Form1 : Form
     {
-        private WaveInEvent waveIn; // 音訊錄製設備 (麥克風)
-        private BufferedWaveProvider bufferedWaveProvider; // 音訊緩衝處理
-        private float[] previousBuffer; // 儲存先前的音訊緩衝數據
-        private const int SampleRate = 44100; // 音訊採樣率 (44.1kHz)
-        private const int MinimumFrequency = 27;  // 最低偵測頻率 (27Hz)
-        private const int MaximumFrequency = 4200; // 最高偵測頻率 (4.2kHz)
+        private WaveInEvent _waveIn; // 音訊錄製設備 (麥克風)
+        private BufferedWaveProvider _bufferedWaveProvider; // 音訊緩衝處理
+        private float[] _previousBuffer; // 儲存先前的音訊緩衝數據
+        private const int _sampleRate = 44100; // 音訊採樣率 (44.1kHz)
+        private const int _minimumFrequency = 27;  // 最低偵測頻率 (27Hz)
+        private const int _maximumFrequency = 4200; // 最高偵測頻率 (4.2kHz)
 
         // 音名與頻率對照表 (基準音的頻率)
-        private static readonly Dictionary<string, float> NoteFrequencies = new Dictionary<string, float>
+        private static readonly Dictionary<string, float> _noteFrequencies = new Dictionary<string, float>
         {
             { "C", 16.35f }, { "C#", 17.32f }, { "D", 18.35f }, { "Eb", 19.45f },
             { "E", 20.60f }, { "F", 21.83f }, { "F#", 23.12f }, { "G", 24.50f },
             { "G#", 25.96f }, { "A", 27.50f }, { "Bb", 29.14f }, { "B", 30.87f }
         };
 
-        private Queue<float> pitchHistory = new Queue<float>(); // 儲存音高歷史
-        private const int MaxHistoryLength = 300; // 波形圖歷史點數限制
+        private Queue<float> _pitchHistory = new Queue<float>(); // 儲存音高歷史
+        private const int _maxHistoryLength = 300; // 波形圖歷史點數限制
 
         public Form1()
         {
@@ -35,7 +35,7 @@ namespace TunerAPP_V2
         // 初始化音訊設備 (麥克風清單)
         private void InitializeAudioDevices()
         {
-            cbxMachine.Items.Clear(); // 清空下拉選單
+            cbxMachine.Items.Clear();
             for (int i = 0; i < WaveInEvent.DeviceCount; i++)
             {
                 cbxMachine.Items.Add(WaveInEvent.GetCapabilities(i).ProductName); // 添加可用音訊設備
@@ -43,53 +43,58 @@ namespace TunerAPP_V2
 
             if (cbxMachine.Items.Count > 0)
             {
-                cbxMachine.SelectedIndex = 0; // 預設選擇第一個設備
+                cbxMachine.SelectedIndex = 0;
             }
         }
 
         // 開始偵測音訊頻率
         private void StartDetection(int deviceIndex)
         {
-            waveIn = new WaveInEvent
+            // 建立收音物件
+            _waveIn = new WaveInEvent
             {
                 DeviceNumber = deviceIndex, // 選擇音訊設備
-                WaveFormat = new WaveFormat(SampleRate, 1) // 設定採樣率為 44.1kHz，單聲道
+                WaveFormat = new WaveFormat(_sampleRate, 1) // 設定採樣率，單聲道
             };
 
-            waveIn.DataAvailable += OnDataAvailable; // 當有音訊數據時觸發事件
-            bufferedWaveProvider = new BufferedWaveProvider(waveIn.WaveFormat)
+            // 當有音訊數據時觸發事件
+            _waveIn.DataAvailable += OnDataAvailable;
+
+            // 建立緩衝區物件
+            _bufferedWaveProvider = new BufferedWaveProvider(_waveIn.WaveFormat)
             {
-                DiscardOnBufferOverflow = true // 如果緩衝區溢出，則丟棄數據
+                DiscardOnBufferOverflow = true // 緩衝區溢出會丟棄數據
             };
 
-            waveIn.StartRecording(); // 開始錄音
+            _waveIn.StartRecording();
         }
 
         // 停止偵測音訊頻率
         private void StopDetection()
         {
-            waveIn?.StopRecording(); // 停止錄音
-            waveIn?.Dispose(); // 釋放資源
-            waveIn = null;
+            _waveIn?.StopRecording(); // 停止錄音
+            _waveIn?.Dispose(); // 釋放資源
+            _waveIn = null;
         }
 
         // 音訊數據可用時的處理方法
         private void OnDataAvailable(object sender, WaveInEventArgs e)
         {
-            bufferedWaveProvider.AddSamples(e.Buffer, 0, e.BytesRecorded); // 添加數據到緩衝區
+            _bufferedWaveProvider.AddSamples(e.Buffer, 0, e.BytesRecorded); // 添加數據到緩衝區
 
             float[] floatBuffer = ConvertToFloatArray(e.Buffer, e.BytesRecorded); // 將位元組數據轉為浮點數
-            float detectedFrequency = DetectFrequency(floatBuffer, SampleRate); // 偵測音訊頻率
+            float detectedFrequency = DetectFrequency(floatBuffer, _sampleRate); // 偵測音訊頻率
 
             // 確保頻率在設定的範圍內
-            if (detectedFrequency >= MinimumFrequency && detectedFrequency <= MaximumFrequency)
+            if (detectedFrequency >= _minimumFrequency && detectedFrequency <= _maximumFrequency)
             {
-                string tuningIndicator; // 調音指示器 (↗、↘、●)
-                string note = GetNoteNameByCent(detectedFrequency, out tuningIndicator); // 取得音名與調音指示器
-                DisplayFrequency(detectedFrequency, note, tuningIndicator); // 顯示頻率與音高資訊
+                string tuningIndicator;
+                float diff;
+                string note = GetNoteNameByCent(detectedFrequency, out tuningIndicator, out diff);
+                DisplayFrequency(detectedFrequency, note, tuningIndicator,diff);
 
-                UpdatePitchHistory(detectedFrequency); // 更新音高歷史
-                DrawWaveform(); // 繪製波形圖
+                UpdatePitchHistory(detectedFrequency);
+                DrawWaveform();
             }
         }
 
@@ -111,13 +116,13 @@ namespace TunerAPP_V2
         // 偵測音訊頻率 (自相關函數法)
         private float DetectFrequency(float[] buffer, int sampleRate)
         {
-            if (previousBuffer == null)
+            if (_previousBuffer == null)
             {
-                previousBuffer = new float[buffer.Length];
+                _previousBuffer = new float[buffer.Length];
             }
 
-            int minLag = sampleRate / MaximumFrequency; // 最小延遲值
-            int maxLag = sampleRate / MinimumFrequency; // 最大延遲值
+            int minLag = sampleRate / _maximumFrequency; // 最小延遲值
+            int maxLag = sampleRate / _minimumFrequency; // 最大延遲值
 
             float[] autocorrelation = new float[maxLag]; // 存放自相關數值
 
@@ -150,30 +155,44 @@ namespace TunerAPP_V2
         /// <param name="frequency">傳入頻率</param>
         /// <param name="tuningIndicator">偏高/偏低/正確</param>
         /// <returns></returns>
-        private string GetNoteNameByCent(float frequency, out string tuningIndicator)
+        private string GetNoteNameByCent(float frequency, out string tuningIndicator, out float diff)
         {
-            tuningIndicator = "●"; // 預設為正確音高
-            foreach (var note in NoteFrequencies)
+            diff = 0;
+            tuningIndicator = "●";
+            foreach (var note in _noteFrequencies)
             {
                 float baseFrequency = note.Value; // 音名的基準頻率
                 for (int octave = 0; octave < 9; octave++)
                 {
-                    float diff = 1200 * (float)Math.Log(frequency / baseFrequency, 2); // 音分計算音程差公式
-                    if (Math.Abs(diff) < 50) // 若頻率差異小於 50 cent
+                    diff = 1200 * (float)Math.Log(frequency / baseFrequency, 2); // 音分計算音程差公式
+
+                    if (diff >= -50 && diff <= 50) // 一個半音是100音分，所以用50音分範圍判斷偏高低
                     {
-                        tuningIndicator = diff > 0 ? "↗" : (diff < 0 ? "↘" : "●"); // 判斷音高偏高或偏低
-                        return $"{note.Key}{octave}"; // 回傳音名與八度數
+                        switch (diff)
+                        {
+                            case > 0:
+                                    tuningIndicator = "↗";
+                                    break;
+                            case < 0:
+                                    tuningIndicator = "↘";
+                                    break;
+                            default:
+                                    tuningIndicator = "●";
+                                    break;
+                        }
+
+                        return $"{note.Key}{octave}";
                     }
-                    baseFrequency *= 2; // 基頻翻倍 (下一個八度)
+                    baseFrequency *= 2;
                 }
             }
             return "超出範圍";
         }
 
         // 顯示頻率與音高資訊
-        private void DisplayFrequency(float frequency, string note, string tuningIndicator)
+        private void DisplayFrequency(float frequency, string note, string tuningIndicator, float diff)
         {
-            string displayMessage = $"頻率:   {frequency:F2} Hz    音高:   {note}   {tuningIndicator}\r\n";
+            string displayMessage = $"頻率:  {frequency:F2} Hz  音高:  {note} {tuningIndicator}  音分差：{diff}\r\n";
 
             lblPitch.Invoke((Action)(() => lblPitch.Text = displayMessage));
             txtPitch.Invoke((Action)(() =>
@@ -183,7 +202,7 @@ namespace TunerAPP_V2
             }));
         }
 
-        // 繪製波形圖
+        #region 繪製波形圖
         private void DrawWaveform()
         {
             if (pictureBox1.Image == null)
@@ -200,7 +219,7 @@ namespace TunerAPP_V2
                 int totalNotes = 88; // A0 (21) 到 C8 (108)，共 88 鍵
                 float yStep = pictureBox1.Height / (float)totalNotes; // 每個音名的間隔
 
-                int xStep = pictureBox1.Width / MaxHistoryLength; // 每個時間片的水平間隔
+                int xStep = pictureBox1.Width / _maxHistoryLength; // 每個時間片的水平間隔
 
                 // 繪製 Y 軸標籤 (音名)
                 using (Pen gridPen = new Pen(Color.LightGray, 1)) // 刻度線為淺灰色
@@ -218,7 +237,7 @@ namespace TunerAPP_V2
                 }
 
                 // 繪製波形曲線
-                float[] pitches = pitchHistory.ToArray();
+                float[] pitches = _pitchHistory.ToArray();
                 using (Pen waveformPen = new Pen(Color.Green, 2)) // 波形為綠色
                 {
                     for (int i = 0; i < pitches.Length - 1; i++)
@@ -243,11 +262,11 @@ namespace TunerAPP_V2
         // 更新音高波形紀錄
         private void UpdatePitchHistory(float frequency)
         {
-            if (pitchHistory.Count >= MaxHistoryLength)
+            if (_pitchHistory.Count >= _maxHistoryLength)
             {
-                pitchHistory.Dequeue(); // 移除最舊的音高
+                _pitchHistory.Dequeue(); // 移除最舊的音高
             }
-            pitchHistory.Enqueue(frequency);
+            _pitchHistory.Enqueue(frequency);
         }
 
         // 根據索引取得音名 (A0 到 C8)
@@ -270,6 +289,7 @@ namespace TunerAPP_V2
             float yStep = height / (float)totalNotes;
             return height - (midiNote - 21) * yStep;
         }
+        #endregion
 
         #region WinForm事件
         // 開始按鈕事件
@@ -293,7 +313,7 @@ namespace TunerAPP_V2
             lblPitch.Text = string.Empty;
             txtPitch.Clear();
             pictureBox1.Image = null;
-            pitchHistory.Clear();
+            _pitchHistory.Clear();
         }
 
         // 音訊設備重新整理按鈕事件
