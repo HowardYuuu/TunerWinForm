@@ -15,12 +15,12 @@ namespace TunerAPP_V2
         private const int _minimumFrequency = 27;  // 最低偵測頻率 (27Hz)
         private const int _maximumFrequency = 4200; // 最高偵測頻率 (4.2kHz)
 
-        // 音名與頻率對照表 (基準音的頻率)
+        // 音名與頻率對照表 (基準音頻)
         private static readonly Dictionary<string, float> _noteFrequencies = new Dictionary<string, float>
         {
-            { "C", 16.35f }, { "C#", 17.32f }, { "D", 18.35f }, { "Eb", 19.45f },
-            { "E", 20.60f }, { "F", 21.83f }, { "F#", 23.12f }, { "G", 24.50f },
-            { "G#", 25.96f }, { "A", 27.50f }, { "Bb", 29.14f }, { "B", 30.87f }
+            { "C", (float) 16.352 }, { "C#", (float) 17.324 }, { "D", (float) 18.354 }, { "Eb", (float) 19.445 },
+            { "E", (float) 20.602 }, { "F", (float) 21.827 }, { "F#", (float) 23.125 }, { "G", (float) 24.500 },
+            { "G#", (float) 25.957 }, { "A", (float) 27.500 }, { "Bb", (float) 29.135 }, { "B", (float) 30.867 }
         };
 
         private Queue<float> _pitchHistory = new Queue<float>(); // 儲存音高歷史
@@ -91,7 +91,7 @@ namespace TunerAPP_V2
                 string tuningIndicator;
                 float diff;
                 string note = GetNoteNameByCent(detectedFrequency, out tuningIndicator, out diff);
-                DisplayFrequency(detectedFrequency, note, tuningIndicator,diff);
+                DisplayFrequency(detectedFrequency, note, tuningIndicator, diff);
 
                 UpdatePitchHistory(detectedFrequency);
                 DrawWaveform();
@@ -170,15 +170,15 @@ namespace TunerAPP_V2
                     {
                         switch (diff)
                         {
-                            case > 0:
-                                    tuningIndicator = "↗";
-                                    break;
-                            case < 0:
-                                    tuningIndicator = "↘";
-                                    break;
+                            case > (float)5:
+                                tuningIndicator = "↗";
+                                break;
+                            case < (float)-5:
+                                tuningIndicator = "↘";
+                                break;
                             default:
-                                    tuningIndicator = "●";
-                                    break;
+                                tuningIndicator = "●";
+                                break;
                         }
 
                         return $"{note.Key}{octave}";
@@ -192,7 +192,7 @@ namespace TunerAPP_V2
         // 顯示頻率與音高資訊
         private void DisplayFrequency(float frequency, string note, string tuningIndicator, float diff)
         {
-            string displayMessage = $"頻率:  {frequency:F2} Hz  音高:  {note} {tuningIndicator}  音分差：{diff}\r\n";
+            string displayMessage = $"頻率:  {frequency:F3} Hz   音高:  {note} {tuningIndicator}   音分差： {diff:F3}\r\n";
 
             lblPitch.Invoke((Action)(() => lblPitch.Text = displayMessage));
             txtPitch.Invoke((Action)(() =>
