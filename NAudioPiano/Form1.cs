@@ -15,6 +15,63 @@ namespace NAudioPiano
         {
             InitializeComponent();
             InitializeAudioDevices();
+            InitKeys();
+        }
+
+        private void InitKeys()
+        {
+            button1.Text = $"C{numericUpDown1.Value}";
+            button3.Text = $"D{numericUpDown1.Value}";
+            button5.Text = $"E{numericUpDown1.Value}";
+            button6.Text = $"F{numericUpDown1.Value}";
+            button8.Text = $"G{numericUpDown1.Value}";
+            button10.Text = $"A{numericUpDown1.Value}";
+            button12.Text = $"B{numericUpDown1.Value}";
+        }
+
+        private void PlayPiano(float frequency)
+        {
+            if (_waveOut.PlaybackState == PlaybackState.Playing)
+            {
+                _waveOut.Stop();
+            }
+            // 初始化音頻生成器
+            _signalGenerator = new SignalGenerator
+            {
+                Gain = 0.2, // 音量
+                Frequency = frequency,
+                Type = SignalGeneratorType.Sin
+            };
+            _waveOut.Init(_signalGenerator);
+
+            _waveOut.Play();
+            Timer timer = new Timer { Interval = 3000 };
+            timer.Tick += (s, args) =>
+            {
+                _waveOut.Stop();
+                timer.Stop();
+                timer.Dispose();
+            };
+            timer.Start();
+        }
+
+        // 初始化音訊設備 (麥克風清單)
+        private void InitializeAudioDevices()
+        {
+            cbxMachine.Items.Clear();
+            for (int i = 0; i < WaveOut.DeviceCount; i++)
+            {
+                cbxMachine.Items.Add(WaveOut.GetCapabilities(i).ProductName);
+            }
+
+            if (cbxMachine.Items.Count > 0)
+            {
+                cbxMachine.SelectedIndex = 0;
+                _waveOut = new WaveOutEvent()
+                {
+                    DeviceNumber = cbxMachine.SelectedIndex,
+                };
+            }
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -89,54 +146,11 @@ namespace NAudioPiano
             PlayPiano(frequency);
         }
 
-        private void PlayPiano(float frequency)
-        {
-            if(_waveOut.PlaybackState == PlaybackState.Playing)
-            {
-                _waveOut.Stop();
-            }
-            // 初始化音頻生成器
-            _signalGenerator = new SignalGenerator
-            {
-                Gain = 0.2, // 音量
-                Frequency = frequency,
-                Type = SignalGeneratorType.Sin
-            };
-            _waveOut.Init(_signalGenerator);
-
-            _waveOut.Play();
-            Timer timer = new Timer { Interval = 3000 };
-            timer.Tick += (s, args) =>
-            {
-                _waveOut.Stop();
-                timer.Stop();
-                timer.Dispose();
-            };
-            timer.Start();
-        }
-
-        // 初始化音訊設備 (麥克風清單)
-        private void InitializeAudioDevices()
-        {
-            cbxMachine.Items.Clear();
-            for (int i = 0; i < WaveOut.DeviceCount; i++)
-            {
-                cbxMachine.Items.Add(WaveOut.GetCapabilities(i).ProductName);
-            }
-
-            if (cbxMachine.Items.Count > 0)
-            {
-                cbxMachine.SelectedIndex = 0;
-                _waveOut = new WaveOutEvent()
-                {
-                    DeviceNumber = cbxMachine.SelectedIndex,
-                };
-            }
-        }
 
         private void numericUpDown1_ValueChanged(object sender, EventArgs e)
         {
             _octive = Convert.ToInt32(numericUpDown1.Value + 1);
+            InitKeys();
         }
 
         private void cbxMachine_SelectedIndexChanged(object sender, EventArgs e)
