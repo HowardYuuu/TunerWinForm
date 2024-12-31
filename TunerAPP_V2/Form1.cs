@@ -14,13 +14,16 @@ namespace TunerAPP_V2
         private const int _sampleRate = 44100; // 音訊採樣率 (44.1kHz)
         private const int _minimumFrequency = 27;  // 最低偵測頻率 (27Hz)
         private const int _maximumFrequency = 4200; // 最高偵測頻率 (4.2kHz)
+        private string tuningIndicator;
+        private float df;
 
         // 音名與頻率對照表 (基準音頻)
         private static readonly Dictionary<string, float> _noteFrequencies = new Dictionary<string, float>
         {
-            { "C", (float) 16.352 }, { "C#", (float) 17.324 }, { "D", (float) 18.354 }, { "Eb", (float) 19.445 },
-            { "E", (float) 20.602 }, { "F", (float) 21.827 }, { "F#", (float) 23.125 }, { "G", (float) 24.500 },
-            { "G#", (float) 25.957 }, { "A", (float) 27.500 }, { "Bb", (float) 29.135 }, { "B", (float) 30.867 }
+            { "C", (float) 16.352 }, { "C#", (float) 17.324 }, { "D", (float) 18.354 },
+            { "Eb", (float) 19.445 },{ "E", (float) 20.602 }, { "F", (float) 21.827 },
+            { "F#", (float) 23.125 }, { "G", (float) 24.500 },{ "G#", (float) 25.957 },
+            { "A", (float) 27.500 }, { "Bb", (float) 29.135 }, { "B", (float) 30.867 }
         };
 
         private Queue<float> _pitchHistory = new Queue<float>(); // 儲存音高歷史
@@ -88,10 +91,8 @@ namespace TunerAPP_V2
             // 確保頻率在設定的範圍內
             if (detectedFrequency >= _minimumFrequency && detectedFrequency <= _maximumFrequency)
             {
-                string tuningIndicator;
-                float diff;
-                string note = GetNoteNameByCent(detectedFrequency, out tuningIndicator, out diff);
-                DisplayFrequency(detectedFrequency, note, tuningIndicator, diff);
+                string note = GetNoteNameByCentBaseFreqFirst(detectedFrequency);
+                DisplayFrequency(detectedFrequency, note, tuningIndicator, df);
 
                 UpdatePitchHistory(detectedFrequency);
                 DrawWaveform();
@@ -150,25 +151,22 @@ namespace TunerAPP_V2
         }
 
         /// <summary>
-        /// 根據頻率及音分判斷音名
+        /// 根據頻率及音分判斷音名(先遊歷每個八度的第一個音)
         /// </summary>
-        /// <param name="frequency">傳入頻率</param>
-        /// <param name="tuningIndicator">偏高/偏低/正確</param>
+        /// <param name = "frequency" > 傳入頻率(Hz) </ param >
         /// <returns></returns>
-        private string GetNoteNameByCent(float frequency, out string tuningIndicator, out float diff)
+        private string GetNoteNameByCentOctaveFirst(float frequency)
         {
-            diff = 0;
-            tuningIndicator = "●";
             foreach (var note in _noteFrequencies)
             {
-                float baseFrequency = note.Value; // 音名的基準頻率
+                float baseFrequency = note.Value;
                 for (int octave = 0; octave < 9; octave++)
                 {
-                    diff = 1200 * (float)Math.Log(frequency / baseFrequency, 2); // 音分計算音程差公式
+                    df = 1200 * (float)Math.Log(frequency / baseFrequency, 2);
 
-                    if (diff >= -50 && diff <= 50) // 一個半音是100音分，所以用50音分範圍判斷偏高低
+                    if (df >= -50 && df <= 50)
                     {
-                        switch (diff)
+                        switch (df)
                         {
                             case > (float)5:
                                 tuningIndicator = "↗";
@@ -184,6 +182,42 @@ namespace TunerAPP_V2
                         return $"{note.Key}{octave}";
                     }
                     baseFrequency *= 2;
+                }
+            }
+            return "超出範圍";
+        }
+
+        /// <summary>
+        /// 根據頻率及音分判斷音名(先遊歷第一個八度)
+        /// </summary>
+        /// <param name="frequency"> 傳入頻率(Hz) </param>
+        /// <returns></returns>
+        private string GetNoteNameByCentBaseFreqFirst(float frequency)
+        {
+            for (int octave = 0; octave < 9; octave++)
+            {
+                foreach (var note in _noteFrequencies)
+                {
+                    float baseFrequency = note.Value * (float)Math.Pow(2, octave);
+                    df = 1200 * (float)Math.Log(frequency / baseFrequency, 2);
+
+                    if (df >= -50 && df <= 50)
+                    {
+                        switch (df)
+                        {
+                            case > (float)5:
+                                tuningIndicator = "↗";
+                                break;
+                            case < (float)-5:
+                                tuningIndicator = "↘";
+                                break;
+                            default:
+                                tuningIndicator = "●";
+                                break;
+                        }
+
+                        return $"{note.Key}{octave}";
+                    }
                 }
             }
             return "超出範圍";

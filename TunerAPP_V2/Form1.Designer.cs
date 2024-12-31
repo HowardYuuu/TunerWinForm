@@ -82,16 +82,16 @@
             txtPitch.Multiline = true;
             txtPitch.Name = "txtPitch";
             txtPitch.ScrollBars = ScrollBars.Both;
-            txtPitch.Size = new Size(1762, 366);
+            txtPitch.Size = new Size(1762, 359);
             txtPitch.TabIndex = 3;
             // 
             // panel1
             // 
             panel1.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             panel1.Controls.Add(txtPitch);
-            panel1.Location = new Point(82, 754);
+            panel1.Location = new Point(82, 808);
             panel1.Name = "panel1";
-            panel1.Size = new Size(1762, 366);
+            panel1.Size = new Size(1762, 359);
             panel1.TabIndex = 4;
             // 
             // btnClear
@@ -124,7 +124,7 @@
             pictureBox1.BackColor = SystemColors.ButtonHighlight;
             pictureBox1.Location = new Point(82, 250);
             pictureBox1.Name = "pictureBox1";
-            pictureBox1.Size = new Size(1725, 490);
+            pictureBox1.Size = new Size(1725, 544);
             pictureBox1.TabIndex = 7;
             pictureBox1.TabStop = false;
             // 
@@ -132,7 +132,7 @@
             // 
             AutoScaleDimensions = new SizeF(14F, 30F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1927, 1143);
+            ClientSize = new Size(1927, 1197);
             Controls.Add(pictureBox1);
             Controls.Add(btnStop);
             Controls.Add(btnClear);

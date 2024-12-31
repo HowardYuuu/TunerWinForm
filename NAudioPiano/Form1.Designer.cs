@@ -42,6 +42,7 @@
             button12 = new Button();
             numericUpDown1 = new NumericUpDown();
             cbxMachine = new ComboBox();
+            textBox1 = new TextBox();
             ((System.ComponentModel.ISupportInitialize)numericUpDown1).BeginInit();
             SuspendLayout();
             // 
@@ -201,9 +202,17 @@
             cbxMachine.FormattingEnabled = true;
             cbxMachine.Location = new Point(337, 113);
             cbxMachine.Name = "cbxMachine";
-            cbxMachine.Size = new Size(822, 63);
+            cbxMachine.Size = new Size(630, 63);
             cbxMachine.TabIndex = 13;
             cbxMachine.SelectedIndexChanged += cbxMachine_SelectedIndexChanged;
+            // 
+            // textBox1
+            // 
+            textBox1.Font = new Font("Microsoft JhengHei UI", 16.125F, FontStyle.Bold, GraphicsUnit.Point, 136);
+            textBox1.Location = new Point(990, 114);
+            textBox1.Name = "textBox1";
+            textBox1.Size = new Size(235, 62);
+            textBox1.TabIndex = 14;
             // 
             // Form1
             // 
@@ -211,6 +220,7 @@
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.ButtonShadow;
             ClientSize = new Size(1782, 1079);
+            Controls.Add(textBox1);
             Controls.Add(cbxMachine);
             Controls.Add(numericUpDown1);
             Controls.Add(button11);
@@ -230,6 +240,7 @@
             Text = "Form1";
             ((System.ComponentModel.ISupportInitialize)numericUpDown1).EndInit();
             ResumeLayout(false);
+            PerformLayout();
         }
 
         #endregion
@@ -248,5 +259,6 @@
         private Button button12;
         private NumericUpDown numericUpDown1;
         private ComboBox cbxMachine;
+        private TextBox textBox1;
     }
 }

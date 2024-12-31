@@ -18,6 +18,10 @@ namespace NAudioPiano
             InitKeys();
         }
 
+
+        /// <summary>
+        /// 重置琴鍵音高顯示
+        /// </summary>
         private void InitKeys()
         {
             button1.Text = $"C{numericUpDown1.Value}";
@@ -29,12 +33,17 @@ namespace NAudioPiano
             button12.Text = $"B{numericUpDown1.Value}";
         }
 
+        /// <summary>
+        /// 執行音訊播放
+        /// </summary>
+        /// <param name="frequency">播放頻率(Hz)</param>
         private void PlayPiano(float frequency)
         {
             if (_waveOut.PlaybackState == PlaybackState.Playing)
             {
                 _waveOut.Stop();
             }
+
             // 初始化音頻生成器
             _signalGenerator = new SignalGenerator
             {
@@ -43,19 +52,23 @@ namespace NAudioPiano
                 Type = SignalGeneratorType.Sin
             };
             _waveOut.Init(_signalGenerator);
-
             _waveOut.Play();
+            textBox1.Text = frequency.ToString() + " Hz";
+
             Timer timer = new Timer { Interval = 3000 };
             timer.Tick += (s, args) =>
             {
                 _waveOut.Stop();
+                textBox1.Text = "";
                 timer.Stop();
                 timer.Dispose();
             };
             timer.Start();
         }
 
-        // 初始化音訊設備 (麥克風清單)
+        /// <summary>
+        /// 初始化音訊設備
+        /// </summary>
         private void InitializeAudioDevices()
         {
             cbxMachine.Items.Clear();
@@ -67,10 +80,12 @@ namespace NAudioPiano
             if (cbxMachine.Items.Count > 0)
             {
                 cbxMachine.SelectedIndex = 0;
+
                 _waveOut = new WaveOutEvent()
                 {
                     DeviceNumber = cbxMachine.SelectedIndex,
                 };
+
             }
         }
 
@@ -149,7 +164,7 @@ namespace NAudioPiano
 
         private void numericUpDown1_ValueChanged(object sender, EventArgs e)
         {
-            _octive = Convert.ToInt32(numericUpDown1.Value + 1);
+            _octive = Convert.ToInt32(numericUpDown1.Value);
             InitKeys();
         }
 
