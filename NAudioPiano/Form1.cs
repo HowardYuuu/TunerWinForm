@@ -85,7 +85,6 @@ namespace NAudioPiano
                 {
                     DeviceNumber = cbxMachine.SelectedIndex,
                 };
-
             }
         }
 
