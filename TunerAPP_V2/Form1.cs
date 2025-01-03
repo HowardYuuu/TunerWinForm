@@ -1,3 +1,4 @@
+using NAudio.Dsp;
 using NAudio.Wave;
 using System;
 using System.Collections.Generic;
@@ -178,7 +179,6 @@ namespace TunerAPP_V2
                                 tuningIndicator = "¡´";
                                 break;
                         }
-
                         return $"{note.Key}{octave}";
                     }
                     baseFrequency *= 2;
@@ -215,7 +215,6 @@ namespace TunerAPP_V2
                                 tuningIndicator = "¡´";
                                 break;
                         }
-
                         return $"{note.Key}{octave}";
                     }
                 }
@@ -234,6 +233,9 @@ namespace TunerAPP_V2
                 txtPitch.AppendText(displayMessage);
                 txtPitch.ScrollToCaret();
             }));
+
+            var s = new SmbPitchShifter();
+            s.PitchShift();
         }
 
         #region Ã¸»sªi§Î¹Ï
