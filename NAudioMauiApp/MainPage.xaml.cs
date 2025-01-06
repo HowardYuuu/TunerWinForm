@@ -6,6 +6,7 @@ namespace NAudioMauiApp
     public partial class MainPage : ContentPage
     {
         int _errorCount = 0;
+        bool _init = true;
         int _octave;
         float _freq;
         float _finalFreq;
@@ -22,7 +23,11 @@ namespace NAudioMauiApp
 
         private void OnStartClicked(object sender, EventArgs e)
         {
-            _finalFreq = getRNGFreq();
+            if (_init)
+            {
+                _finalFreq = getRNGFreq();
+                _init = false;
+            }
             _playAudioService.PlayGame(_finalFreq);
         }
 
@@ -39,6 +44,8 @@ namespace NAudioMauiApp
                     if (_errorCount == 3)
                     {
                         _errorCount = 0;
+                        _init = true;
+                        DisplayAlert("答錯達3次！", $"將重置音頻", "OK");
                         return;
                     }
                     else
@@ -49,7 +56,8 @@ namespace NAudioMauiApp
                 }
                 if ((float)parameter * _octave == _finalFreq)
                 {
-                    DisplayAlert("答對","", "OK");
+                    _init = true;
+                    DisplayAlert("答對", "", "OK");
                 }
             }
             catch (Exception ex)
