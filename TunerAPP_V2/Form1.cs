@@ -51,23 +51,23 @@ namespace TunerAPP_V2
             }
         }
 
-        // 開始偵測音訊頻率
+        //開始偵測音訊頻率
         private void StartDetection(int deviceIndex)
         {
-            // 建立收音物件
+            //建立收音物件
             _waveIn = new WaveInEvent
             {
-                DeviceNumber = deviceIndex, // 選擇音訊設備
-                WaveFormat = new WaveFormat(_sampleRate, 1) // 設定採樣率，單聲道
+                DeviceNumber = deviceIndex, //選擇音訊設備
+                WaveFormat = new WaveFormat(_sampleRate, 1) //設定採樣率，單聲道
             };
 
-            // 當有音訊數據時觸發事件
+            //觸發事件
             _waveIn.DataAvailable += OnDataAvailable;
 
-            // 建立緩衝區物件
+            //建立緩衝區物件
             _bufferedWaveProvider = new BufferedWaveProvider(_waveIn.WaveFormat)
             {
-                DiscardOnBufferOverflow = true // 緩衝區溢出會丟棄數據
+                DiscardOnBufferOverflow = true
             };
 
             _waveIn.StartRecording();
@@ -233,9 +233,6 @@ namespace TunerAPP_V2
                 txtPitch.AppendText(displayMessage);
                 txtPitch.ScrollToCaret();
             }));
-
-            var s = new SmbPitchShifter();
-            s.PitchShift();
         }
 
         #region 繪製波形圖

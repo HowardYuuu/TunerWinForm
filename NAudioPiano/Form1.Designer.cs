@@ -188,7 +188,7 @@
             // numericUpDown1
             // 
             numericUpDown1.Font = new Font("Microsoft JhengHei UI", 16.125F, FontStyle.Bold, GraphicsUnit.Point, 136);
-            numericUpDown1.Location = new Point(990, 115);
+            numericUpDown1.Location = new Point(987, 115);
             numericUpDown1.Maximum = new decimal(new int[] { 8, 0, 0, 0 });
             numericUpDown1.Name = "numericUpDown1";
             numericUpDown1.Size = new Size(182, 62);

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="NAudioMauiApp.Pages.NPage1"
+             Title="NPage1">
+    <VerticalStackLayout>
+        <Label Text="猜音遊戲" FontSize="24" HorizontalOptions="Center" />
+        <HorizontalStackLayout>
+            <Button Text="C" Command="{Binding PlayCommand}" CommandParameter="C" />
+            <Button Text="C#" Command="{Binding PlayCommand}" CommandParameter="C#" />
+            <Button Text="D" Command="{Binding PlayCommand}" CommandParameter="D" />
+            <Button Text="D#" Command="{Binding PlayCommand}" CommandParameter="D#" />
+            <Button Text="E" Command="{Binding PlayCommand}" CommandParameter="E" />
+            <Button Text="F" Command="{Binding PlayCommand}" CommandParameter="F" />
+            <Button Text="F#" Command="{Binding PlayCommand}" CommandParameter="F#" />
+            <Button Text="G" Command="{Binding PlayCommand}" CommandParameter="G" />
+            <Button Text="G#" Command="{Binding PlayCommand}" CommandParameter="G#" />
+            <Button Text="A" Command="{Binding PlayCommand}" CommandParameter="A" />
+            <Button Text="A#" Command="{Binding PlayCommand}" CommandParameter="A#" />
+            <Button Text="B" Command="{Binding PlayCommand}" CommandParameter="B" />
+        </HorizontalStackLayout>
+        <Label x:Name="HintLabel" Text="聽到音頻後請選擇正確的鍵" HorizontalOptions="Center" />
+    </VerticalStackLayout>
+
+</ContentPage>
