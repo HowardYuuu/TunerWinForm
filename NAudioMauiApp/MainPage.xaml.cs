@@ -9,7 +9,7 @@ namespace NAudioMauiApp
         bool _init = true;
         int _octave;
         float _freq;
-        float _finalFreq;
+        float _finalFreq; //答案
         PlayAudioService _playAudioService = new PlayAudioService();
         public Command PlayCommand { get; set; }
 
@@ -33,36 +33,39 @@ namespace NAudioMauiApp
 
         private void OnAnswerClicked(object parameter)
         {
+            
+            _playAudioService.PlayGame((float)parameter);
+
             try
             {
                 if (parameter == null)
                 {
                     return;
                 }
-                if ((float)parameter * _octave != _finalFreq)
+                if ((float)parameter * (float)Math.Pow(2, _octave) != _finalFreq)
                 {
                     if (_errorCount == 3)
                     {
                         _errorCount = 0;
                         _init = true;
-                        DisplayAlert("答錯達3次！", $"將重置音頻", "OK");
+                        DisplayAlert("答錯達3次！", $"答錯已達3次，將重置音頻", "OK");
                         return;
                     }
                     else
                     {
                         _errorCount++;
-                        DisplayAlert("答錯", $"剩餘 {3 - _errorCount} 次機會", "OK");
+                        DisplayAlert("答錯", $"剩餘 {3 - _errorCount} 次機會！", "OK");
                     }
                 }
                 if ((float)parameter * _octave == _finalFreq)
                 {
                     _init = true;
-                    DisplayAlert("答對", "", "OK");
+                    DisplayAlert("答對", "恭喜答對！", "OK");
                 }
             }
             catch (Exception ex)
             {
-                DisplayAlert("錯誤訊息：", ex.Message, "OK");
+                DisplayAlert("錯誤訊息", ex.Message, "OK");
             }
 
         }
@@ -83,7 +86,7 @@ namespace NAudioMauiApp
             _octave = rngOctave.Next(0, 8);
             _freq = (float)baseFreq[baseFreqIndex];
 
-            return _freq * _octave;
+            return _freq * (float)Math.Pow(2, _octave);
         }
     }
 
