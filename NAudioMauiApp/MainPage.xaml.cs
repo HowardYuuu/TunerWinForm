@@ -19,8 +19,6 @@ namespace NAudioMauiApp
             PlayCommand = new Command(OnAnswerClicked);
         }
 
-
-
         private void OnStartClicked(object sender, EventArgs e)
         {
             if (_init)
@@ -33,7 +31,7 @@ namespace NAudioMauiApp
 
         private void OnAnswerClicked(object parameter)
         {
-            
+
             _playAudioService.PlayGame((float)parameter);
 
             try
@@ -77,10 +75,10 @@ namespace NAudioMauiApp
 
             List<float> baseFreq = new List<float>
             {
-                16.352f,17.324f,18.354f,
-                19.445f,20.602f,21.827f,
-                23.125f,24.500f,25.957f,
-                27.500f,29.135f,30.868f
+                16.352f, 17.324f, 18.354f,
+                19.445f, 20.602f, 21.827f,
+                23.125f, 24.500f, 25.957f,
+                27.500f, 29.135f, 30.868f
             };
             int baseFreqIndex = rngBaseFreq.Next(baseFreq.Count);
             _octave = rngOctave.Next(0, 8);
