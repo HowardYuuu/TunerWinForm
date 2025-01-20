@@ -76,8 +76,8 @@ namespace TunerAPP_V2
         // 停止偵測音訊頻率
         private void StopDetection()
         {
-            _waveIn?.StopRecording(); // 停止錄音
-            _waveIn?.Dispose(); // 釋放資源
+            _waveIn?.StopRecording();
+            _waveIn?.Dispose();
             _waveIn = null;
         }
 
@@ -238,58 +238,67 @@ namespace TunerAPP_V2
         #region 繪製波形圖
         private void DrawWaveform()
         {
-            if (pictureBox1.Image == null)
+            try
             {
-                pictureBox1.Image = new Bitmap(pictureBox1.Width, pictureBox1.Height);
-            }
-
-            using (Graphics g = Graphics.FromImage(pictureBox1.Image))
-            {
-                // 清空畫布，設置背景為白色
-                g.Clear(Color.White);
-
-                // 設定參數
-                int totalNotes = 88; // A0 (21) 到 C8 (108)，共 88 鍵
-                float yStep = pictureBox1.Height / (float)totalNotes; // 每個音名的間隔
-
-                int xStep = pictureBox1.Width / _maxHistoryLength; // 每個時間片的水平間隔
-
-                // 繪製 Y 軸標籤 (音名)
-                using (Pen gridPen = new Pen(Color.LightGray, 1)) // 刻度線為淺灰色
-                using (Brush textBrush = new SolidBrush(Color.Black)) // 標籤文字為黑色
-                using (Font font = new Font("Arial", 8))
+                if (pictureBox1.Image == null)
                 {
-                    for (int i = 0; i < totalNotes; i++)
-                    {
-                        string note = GetNoteNameByIndex(i); // 根據索引取得音名
-                        float y = pictureBox1.Height - i * yStep;
-
-                        g.DrawLine(gridPen, 0, y, pictureBox1.Width, y); // 畫水平線
-                        g.DrawString(note, font, textBrush, 0, y - font.Height / 2); // 顯示音名標籤
-                    }
+                    pictureBox1.Image = new Bitmap(pictureBox1.Width, pictureBox1.Height);
                 }
 
-                // 繪製波形曲線
-                float[] pitches = _pitchHistory.ToArray();
-                using (Pen waveformPen = new Pen(Color.Green, 2)) // 波形為綠色
+                using (Graphics g = Graphics.FromImage(pictureBox1.Image))
                 {
-                    for (int i = 0; i < pitches.Length - 1; i++)
+                    // 清空畫布，設置背景為白色
+                    g.Clear(Color.White);
+
+                    // 設定參數
+                    int totalNotes = 88; // A0 (21) 到 C8 (108)，共 88 鍵
+                    float yStep = pictureBox1.Height / (float)totalNotes; // 每個音名的間隔
+
+                    int xStep = pictureBox1.Width / _maxHistoryLength; // 每個時間片的水平間隔
+
+                    // 繪製 Y 軸標籤 (音名)
+                    using (Pen gridPen = new Pen(Color.LightGray, 1)) // 刻度線為淺灰色
+                    using (Brush textBrush = new SolidBrush(Color.Black)) // 標籤文字為黑色
+                    using (Font font = new Font("Arial", 8))
                     {
-                        float x1 = 40 + i * xStep;
-                        float x2 = 40 + (i + 1) * xStep;
-
-                        float y1 = GetYPositionByFrequency(pitches[i], pictureBox1.Height, totalNotes);
-                        float y2 = GetYPositionByFrequency(pitches[i + 1], pictureBox1.Height, totalNotes);
-
-                        if (y1 >= 0 && y1 <= pictureBox1.Height && y2 >= 0 && y2 <= pictureBox1.Height)
+                        for (int i = 0; i < totalNotes; i++)
                         {
-                            g.DrawLine(waveformPen, x1, y1, x2, y2);
+                            string note = GetNoteNameByIndex(i); // 根據索引取得音名
+                            float y = pictureBox1.Height - i * yStep;
+
+                            g.DrawLine(gridPen, 0, y, pictureBox1.Width, y); // 畫水平線
+                            g.DrawString(note, font, textBrush, 0, y - font.Height / 2); // 顯示音名標籤
+                        }
+                    }
+
+                    // 繪製波形曲線
+                    float[] pitches = _pitchHistory.ToArray();
+                    using (Pen waveformPen = new Pen(Color.Green, 2)) // 波形為綠色
+                    {
+                        for (int i = 0; i < pitches.Length - 1; i++)
+                        {
+                            float x1 = 40 + i * xStep;
+                            float x2 = 40 + (i + 1) * xStep;
+
+                            float y1 = GetYPositionByFrequency(pitches[i], pictureBox1.Height, totalNotes);
+                            float y2 = GetYPositionByFrequency(pitches[i + 1], pictureBox1.Height, totalNotes);
+
+                            if (y1 >= 0 && y1 <= pictureBox1.Height && y2 >= 0 && y2 <= pictureBox1.Height)
+                            {
+                                g.DrawLine(waveformPen, x1, y1, x2, y2);
+                            }
                         }
                     }
                 }
-            }
 
-            pictureBox1.Invalidate(); // 觸發重新繪製
+                pictureBox1.Invalidate(); // 觸發重新繪製
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+                StopDetection();
+                return;
+            }
         }
 
         // 更新音高波形紀錄
