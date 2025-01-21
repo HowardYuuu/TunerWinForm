@@ -12,16 +12,17 @@ namespace MP3DownloaderAPP
         YoutubeClient _youtube = new YoutubeClient();
         AudioHelper _audioHelper = new AudioHelper();
         UrlHelper _urlHelper = new UrlHelper();
-        private string fileName = "";
-        private string downloadFolderPath = "";
+        private string _fileName = "";
+        private string _downloadFolderPath = "";
         public Form1()
         {
             InitializeComponent();
         }
+        #region [Controls]
         private async void btnDownload_Click(object sender, EventArgs e)
         {
             #region 下載驗證
-            if (String.IsNullOrWhiteSpace(downloadFolderPath))
+            if (String.IsNullOrWhiteSpace(_downloadFolderPath))
             {
                 MessageBox.Show("尚未選擇下載資料夾");
                 return;
@@ -50,7 +51,6 @@ namespace MP3DownloaderAPP
                     {
                         break;
                     }
-
                     count++;
                 }
                 if (isDownload)
@@ -59,7 +59,7 @@ namespace MP3DownloaderAPP
                 }
                 else
                 {
-                    listStatus.Items.Add($"{fileName} 下載失敗！");
+                    listStatus.Items.Add($"{_fileName} 下載失敗！");
                     listStatus.Items.Add("======================================");
                 }
             }
@@ -75,7 +75,7 @@ namespace MP3DownloaderAPP
                 MessageBox.Show("請輸入 URL！");
                 return;
             }
-            if (!txtUrl.Text.Contains("youtube.com")||!_urlHelper.IsValidUrl(txtUrl.Text))
+            if (!txtUrl.Text.Contains("youtube.com") || !_urlHelper.IsValidUrl(txtUrl.Text))
             {
                 MessageBox.Show("URL 格式不正確！必須是 YouTube 影片 URL！");
                 return;
@@ -87,30 +87,19 @@ namespace MP3DownloaderAPP
 
         private void btnPath_Click(object sender, EventArgs e)
         {
-            // 讓用戶選擇下載資料夾
-            using (var folderDialog = new FolderBrowserDialog())
-            {
-                folderDialog.Description = "選擇下載資料夾";
-                if (folderDialog.ShowDialog() == DialogResult.OK)
-                {
-                    downloadFolderPath = folderDialog.SelectedPath;
-                    lblPath.Text = downloadFolderPath;
-                }
-                else
-                {
-                    return;
-                }
-            }
+            getDownloadPath();
         }
+        #endregion
 
+        #region [Functions]
         public async Task<bool> DownloadMP3(string videoUrl)
         {
             try
             {
                 // 初始化 YouTube 客戶端
                 var video = await _youtube.Videos.GetAsync(videoUrl);
-                fileName = video.Title; // 取得影片標題
-                string outputMp3Path = $@"{downloadFolderPath}\{fileName}.mp3";
+                _fileName = video.Title; // 取得影片標題
+                string outputMp3Path = $@"{_downloadFolderPath}\{_fileName}.mp3";
 
 
                 // 取得影片的音訊流資訊
@@ -121,11 +110,11 @@ namespace MP3DownloaderAPP
                 string tempAudioPath = "temp_audio.m4a";
 
                 // 下載音訊流
-                listStatus.Items.Add($"正在下載 {fileName} 音訊流...");
+                listStatus.Items.Add($"正在下載 {_fileName} 音訊流...");
                 await _youtube.Videos.Streams.DownloadAsync(audioStreamInfo, tempAudioPath);
 
                 // 轉換為 MP3
-                listStatus.Items.Add($"正在轉換為 {fileName} MP3...");
+                listStatus.Items.Add($"正在轉換為 {_fileName} MP3...");
                 _audioHelper.ConvertToMp3(tempAudioPath, outputMp3Path);
 
                 // 刪除暫存檔案
@@ -145,11 +134,29 @@ namespace MP3DownloaderAPP
             }
             catch (Exception ex)
             {
-                listStatus.Items.Add($"{fileName}發生錯誤：" + ex.Message);
+                listStatus.Items.Add($"{_fileName}發生錯誤：" + ex.Message);
                 listStatus.Items.Add("再重新下載一次");
                 listStatus.Items.Add("======================================");
                 return false;
             }
         }
+        public void getDownloadPath()
+        {
+            // 讓用戶選擇下載資料夾
+            using (var folderDialog = new FolderBrowserDialog())
+            {
+                folderDialog.Description = "選擇下載資料夾";
+                if (folderDialog.ShowDialog() == DialogResult.OK)
+                {
+                    _downloadFolderPath = folderDialog.SelectedPath;
+                    lblPath.Text = _downloadFolderPath;
+                }
+                else
+                {
+                    return;
+                }
+            }
+        }
+        #endregion
     }
 }
