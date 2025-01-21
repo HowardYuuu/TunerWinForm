@@ -43,6 +43,9 @@ namespace MP3DownloaderAPP
                 var item = listUrl.Items[i];
                 int count = 0;
                 bool isDownload = false;
+
+                DisableButtons();
+
                 // 重試邏輯
                 while (count < 2)
                 {
@@ -63,8 +66,8 @@ namespace MP3DownloaderAPP
                     listStatus.Items.Add("======================================");
                 }
             }
-
             MessageBox.Show($"下載結束，剩餘：{listUrl.Items.Count} 項未下載！");
+            EnableButtons();
         }
 
         private void btnAdd_Click(object sender, EventArgs e)
@@ -154,6 +157,28 @@ namespace MP3DownloaderAPP
                 else
                 {
                     return;
+                }
+            }
+        }
+        private void DisableButtons()
+        {
+            foreach (Control control in this.Controls)
+            {
+                if (control is Button button)
+                {
+                    button.Enabled = false;
+                }
+            }
+        }
+
+        // 啟用所有按鈕
+        private void EnableButtons()
+        {
+            foreach (Control control in this.Controls)
+            {
+                if (control is Button button)
+                {
+                    button.Enabled = true;
                 }
             }
         }
