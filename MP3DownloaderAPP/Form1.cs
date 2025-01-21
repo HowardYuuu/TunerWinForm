@@ -9,9 +9,9 @@ namespace MP3DownloaderAPP
 {
     public partial class Form1 : Form
     {
-        YoutubeClient _youtube = new YoutubeClient();
-        AudioHelper _audioHelper = new AudioHelper();
-        UrlHelper _urlHelper = new UrlHelper();
+        private readonly YoutubeClient _youtube = new YoutubeClient();
+        private readonly AudioHelper _audioHelper = new AudioHelper();
+        private readonly UrlHelper _urlHelper = new UrlHelper();
         private string _fileName = "";
         private string _downloadFolderPath = "";
         public Form1()
