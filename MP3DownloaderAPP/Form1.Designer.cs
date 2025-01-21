@@ -40,7 +40,7 @@
             // txtUrl
             // 
             txtUrl.Font = new Font("Microsoft JhengHei UI", 16.125F, FontStyle.Regular, GraphicsUnit.Point, 136);
-            txtUrl.Location = new Point(46, 178);
+            txtUrl.Location = new Point(46, 203);
             txtUrl.Name = "txtUrl";
             txtUrl.Size = new Size(883, 62);
             txtUrl.TabIndex = 0;
@@ -97,9 +97,9 @@
             // 
             lblPath.BackColor = SystemColors.ButtonHighlight;
             lblPath.Font = new Font("Microsoft JhengHei UI", 16.125F, FontStyle.Regular, GraphicsUnit.Point, 136);
-            lblPath.Location = new Point(46, 88);
+            lblPath.Location = new Point(46, 79);
             lblPath.Name = "lblPath";
-            lblPath.Size = new Size(883, 60);
+            lblPath.Size = new Size(883, 87);
             lblPath.TabIndex = 7;
             // 
             // Form1
