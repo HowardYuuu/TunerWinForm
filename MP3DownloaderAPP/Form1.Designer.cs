@@ -40,16 +40,16 @@
             // txtUrl
             // 
             txtUrl.Font = new Font("Microsoft JhengHei UI", 16.125F, FontStyle.Regular, GraphicsUnit.Point, 136);
-            txtUrl.Location = new Point(217, 204);
+            txtUrl.Location = new Point(46, 178);
             txtUrl.Name = "txtUrl";
             txtUrl.Size = new Size(883, 62);
             txtUrl.TabIndex = 0;
             // 
             // btnDownload
             // 
-            btnDownload.Location = new Point(1120, 297);
+            btnDownload.Location = new Point(1206, 79);
             btnDownload.Name = "btnDownload";
-            btnDownload.Size = new Size(240, 87);
+            btnDownload.Size = new Size(301, 186);
             btnDownload.TabIndex = 1;
             btnDownload.Text = "開始";
             btnDownload.UseVisualStyleBackColor = true;
@@ -59,14 +59,14 @@
             // 
             listUrl.FormattingEnabled = true;
             listUrl.ItemHeight = 30;
-            listUrl.Location = new Point(217, 501);
+            listUrl.Location = new Point(46, 302);
             listUrl.Name = "listUrl";
-            listUrl.Size = new Size(583, 394);
+            listUrl.Size = new Size(1461, 274);
             listUrl.TabIndex = 2;
             // 
             // btnAdd
             // 
-            btnAdd.Location = new Point(1120, 204);
+            btnAdd.Location = new Point(949, 178);
             btnAdd.Name = "btnAdd";
             btnAdd.Size = new Size(240, 87);
             btnAdd.TabIndex = 3;
@@ -78,14 +78,14 @@
             // 
             listStatus.FormattingEnabled = true;
             listStatus.ItemHeight = 30;
-            listStatus.Location = new Point(841, 501);
+            listStatus.Location = new Point(46, 614);
             listStatus.Name = "listStatus";
-            listStatus.Size = new Size(530, 394);
+            listStatus.Size = new Size(1461, 334);
             listStatus.TabIndex = 4;
             // 
             // btnPath
             // 
-            btnPath.Location = new Point(1120, 105);
+            btnPath.Location = new Point(949, 79);
             btnPath.Name = "btnPath";
             btnPath.Size = new Size(240, 87);
             btnPath.TabIndex = 6;
@@ -97,7 +97,7 @@
             // 
             lblPath.BackColor = SystemColors.ButtonHighlight;
             lblPath.Font = new Font("Microsoft JhengHei UI", 16.125F, FontStyle.Regular, GraphicsUnit.Point, 136);
-            lblPath.Location = new Point(217, 114);
+            lblPath.Location = new Point(46, 88);
             lblPath.Name = "lblPath";
             lblPath.Size = new Size(883, 60);
             lblPath.TabIndex = 7;
@@ -106,7 +106,7 @@
             // 
             AutoScaleDimensions = new SizeF(14F, 30F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1554, 1034);
+            ClientSize = new Size(1557, 1034);
             Controls.Add(lblPath);
             Controls.Add(btnPath);
             Controls.Add(listStatus);

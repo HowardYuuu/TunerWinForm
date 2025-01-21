@@ -2,14 +2,17 @@ using YoutubeExplode;
 using NAudio.Wave;
 using NAudio.Lame;
 using YoutubeExplode.Videos.Streams;
+using System.Windows.Forms.Design;
 
 
 namespace MP3DownloaderAPP
 {
     public partial class Form1 : Form
     {
-        YoutubeClient _youtube;
-        AudioHelper _audioHelper;
+        YoutubeClient _youtube = new YoutubeClient();
+        AudioHelper _audioHelper = new AudioHelper();
+        UrlHelper _urlHelper = new UrlHelper();
+        private string fileName = "";
         private string downloadFolderPath = "";
         public Form1()
         {
@@ -17,7 +20,7 @@ namespace MP3DownloaderAPP
         }
         private async void btnDownload_Click(object sender, EventArgs e)
         {
-            #region 下載前檢查
+            #region 下載驗證
             if (String.IsNullOrWhiteSpace(downloadFolderPath))
             {
                 MessageBox.Show("尚未選擇下載資料夾");
@@ -33,32 +36,51 @@ namespace MP3DownloaderAPP
                 listStatus.Items.Clear();
             }
             #endregion
-            try
+
+            for (int i = listUrl.Items.Count - 1; i >= 0; i--)
             {
-                _youtube = new YoutubeClient();
-                _audioHelper = new AudioHelper();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("發生錯誤：" + ex.Message);
-            }
-            foreach (var item in listUrl.Items)
-            {
-                await DownloadMP3(item.ToString());
+                var item = listUrl.Items[i];
+                int count = 0;
+                bool isDownload = false;
+                // 重試邏輯
+                while (count < 2)
+                {
+                    isDownload = await DownloadMP3(item.ToString());
+                    if (isDownload)
+                    {
+                        break;
+                    }
+
+                    count++;
+                }
+                if (isDownload)
+                {
+                    listUrl.Items.RemoveAt(i); // 移除當前項目
+                }
+                else
+                {
+                    listStatus.Items.Add($"{fileName} 下載失敗！");
+                    listStatus.Items.Add("======================================");
+                }
             }
 
-            MessageBox.Show("全部下載完成！");
-            listUrl.Items.Clear();
-
+            MessageBox.Show($"下載結束，剩餘：{listUrl.Items.Count} 項未下載！");
         }
 
         private void btnAdd_Click(object sender, EventArgs e)
         {
+            #region URL驗證
             if (String.IsNullOrWhiteSpace(txtUrl.Text))
             {
                 MessageBox.Show("請輸入 URL！");
                 return;
             }
+            if (!txtUrl.Text.Contains("youtube.com")||!_urlHelper.IsValidUrl(txtUrl.Text))
+            {
+                MessageBox.Show("URL 格式不正確！必須是 YouTube 影片 URL！");
+                return;
+            }
+            #endregion
             listUrl.Items.Add(txtUrl.Text);
             txtUrl.Text = "";
         }
@@ -76,19 +98,18 @@ namespace MP3DownloaderAPP
                 }
                 else
                 {
-                    MessageBox.Show("未選擇下載資料夾，操作已取消。");
                     return;
                 }
             }
         }
 
-        public async Task DownloadMP3(string videoUrl)
+        public async Task<bool> DownloadMP3(string videoUrl)
         {
             try
             {
                 // 初始化 YouTube 客戶端
                 var video = await _youtube.Videos.GetAsync(videoUrl);
-                string fileName = video.Title; // 取得影片標題
+                fileName = video.Title; // 取得影片標題
                 string outputMp3Path = $@"{downloadFolderPath}\{fileName}.mp3";
 
 
@@ -111,7 +132,7 @@ namespace MP3DownloaderAPP
                 File.Delete(tempAudioPath);
 
                 listStatus.Items.Add($"下載完成！MP3 檔案位置：{outputMp3Path}");
-
+                listStatus.Items.Add("======================================");
                 if (listUrl.Items.Count > 15)
                 {
                     await Task.Delay(3000);
@@ -120,13 +141,15 @@ namespace MP3DownloaderAPP
                 {
                     await Task.Delay(5000);
                 }
+                return true;
             }
             catch (Exception ex)
             {
-                MessageBox.Show("發生錯誤：" + ex.Message);
+                listStatus.Items.Add($"{fileName}發生錯誤：" + ex.Message);
+                listStatus.Items.Add("再重新下載一次");
+                listStatus.Items.Add("======================================");
+                return false;
             }
         }
-
-
     }
 }
