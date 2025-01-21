@@ -11,8 +11,8 @@ class Program
     static async Task Main(string[] args)
     {
         // 要下載的 YouTube 影片 URL
-        string videoUrl = "https://www.youtube.com/watch?v=DYptgVvkVLQ";
-        string fileName = "晴天";
+        string videoUrl = "https://www.youtube.com/watch?v=K9CbHZLXPIA";
+        string fileName = "";
         // 輸出 MP3 檔案名稱
         string outputMp3Path = $@"D:\Downloads\{fileName}.mp3";
 
@@ -20,6 +20,8 @@ class Program
         {
             // 初始化 YouTube 客戶端
             var youtube = new YoutubeClient();
+            var video = await youtube.Videos.GetAsync(videoUrl);
+            fileName = video.Title; // 取得影片標題
 
             // 取得影片的音訊流資訊
             var streamManifest = await youtube.Videos.Streams.GetManifestAsync(videoUrl);
