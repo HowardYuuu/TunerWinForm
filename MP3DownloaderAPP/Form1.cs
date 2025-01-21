@@ -49,6 +49,7 @@ namespace MP3DownloaderAPP
 
             MessageBox.Show("全部下載完成！");
             listUrl.Items.Clear();
+
         }
 
         private void btnAdd_Click(object sender, EventArgs e)
@@ -110,7 +111,15 @@ namespace MP3DownloaderAPP
                 File.Delete(tempAudioPath);
 
                 listStatus.Items.Add($"下載完成！MP3 檔案位置：{outputMp3Path}");
-                await Task.Delay(5000);
+
+                if (listUrl.Items.Count > 15)
+                {
+                    await Task.Delay(3000);
+                }
+                else
+                {
+                    await Task.Delay(5000);
+                }
             }
             catch (Exception ex)
             {
