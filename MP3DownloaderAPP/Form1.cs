@@ -3,12 +3,14 @@ using NAudio.Wave;
 using NAudio.Lame;
 using YoutubeExplode.Videos.Streams;
 using System.Windows.Forms.Design;
+using NLog;
 
 
 namespace MP3DownloaderAPP
 {
     public partial class Form1 : Form
     {
+        private readonly Logger _logger = LogManager.GetCurrentClassLogger();
         private readonly YoutubeClient _youtube = new YoutubeClient();
         private readonly AudioHelper _audioHelper = new AudioHelper();
         private readonly UrlHelper _urlHelper = new UrlHelper();
@@ -16,6 +18,7 @@ namespace MP3DownloaderAPP
         private string _downloadFolderPath = "";
         public Form1()
         {
+            _logger.Info("開始驗證");
             InitializeComponent();
         }
         #region [Controls]
@@ -37,7 +40,6 @@ namespace MP3DownloaderAPP
                 listStatus.Items.Clear();
             }
             #endregion
-
             for (int i = listUrl.Items.Count - 1; i >= 0; i--)
             {
                 var item = listUrl.Items[i];
@@ -49,10 +51,14 @@ namespace MP3DownloaderAPP
                 // 重試邏輯
                 while (count < 2)
                 {
-                    isDownload = await DownloadMP3(item.ToString());
-                    if (isDownload)
+                    string videoUrl = item?.ToString();
+                    if (!string.IsNullOrEmpty(videoUrl))
                     {
-                        break;
+                        isDownload = await DownloadMP3(videoUrl);
+                        if (isDownload)
+                        {
+                            break;
+                        }
                     }
                     count++;
                 }
@@ -72,6 +78,7 @@ namespace MP3DownloaderAPP
 
         private void btnAdd_Click(object sender, EventArgs e)
         {
+            _logger.Info("加入URL");
             #region URL驗證
             if (String.IsNullOrWhiteSpace(txtUrl.Text))
             {
@@ -137,6 +144,7 @@ namespace MP3DownloaderAPP
             }
             catch (Exception ex)
             {
+                _logger.Error($"{_fileName}發生錯誤：" + ex.Message);
                 listStatus.Items.Add($"{_fileName}發生錯誤：" + ex.Message);
                 listStatus.Items.Add("再重新下載一次");
                 listStatus.Items.Add("======================================");
@@ -170,8 +178,6 @@ namespace MP3DownloaderAPP
                 }
             }
         }
-
-        // 啟用所有按鈕
         private void EnableButtons()
         {
             foreach (Control control in this.Controls)

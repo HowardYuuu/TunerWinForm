@@ -10,8 +10,13 @@ namespace MP3DownloaderAPP
     {
         public bool IsValidUrl(string url)
         {
+            if (string.IsNullOrWhiteSpace(url))
+            {
+                return false;
+            }
+
             return Uri.TryCreate(url, UriKind.Absolute, out Uri uriResult)
-                   && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
+                && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
         }
     }
 }
