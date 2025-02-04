@@ -144,10 +144,10 @@ namespace MP3DownloaderAPP
             }
             catch (Exception ex)
             {
-                _logger.Error($"{_fileName}發生錯誤：" + ex.Message);
                 listStatus.Items.Add($"{_fileName}發生錯誤：" + ex.Message);
                 listStatus.Items.Add("再重新下載一次");
                 listStatus.Items.Add("======================================");
+                _logger.Error($"{_fileName}發生錯誤：" + ex.Message);
                 return false;
             }
         }
