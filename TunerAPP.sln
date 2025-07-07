@@ -11,9 +11,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NAudioMauiApp", "NAudioMaui
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PitchShiftApp", "PitchShiftApp\PitchShiftApp.csproj", "{91476683-F36C-464E-BF5A-C2E502D9B545}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MP3Downloader", "MP3Downloader\MP3Downloader.csproj", "{D5380BE0-75B4-43F9-8B8E-BF66A30A9AC3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MP3Downloader", "MP3Downloader\MP3Downloader.csproj", "{D5380BE0-75B4-43F9-8B8E-BF66A30A9AC3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MP3DownloaderAPP", "MP3DownloaderAPP\MP3DownloaderAPP.csproj", "{C19E960E-FB7A-4D06-9464-719888B89B6E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MP3DownloaderAPP", "MP3DownloaderAPP\MP3DownloaderAPP.csproj", "{C19E960E-FB7A-4D06-9464-719888B89B6E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MathTest", "MathTest\MathTest.csproj", "{664E78DA-C55B-46B7-A175-97E652770AF8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VoskAPP", "VoskAPP\VoskAPP.csproj", "{36C78D4A-6189-40E8-8930-D88D352BD3C4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -47,6 +51,14 @@ Global
 		{C19E960E-FB7A-4D06-9464-719888B89B6E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C19E960E-FB7A-4D06-9464-719888B89B6E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C19E960E-FB7A-4D06-9464-719888B89B6E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{664E78DA-C55B-46B7-A175-97E652770AF8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{664E78DA-C55B-46B7-A175-97E652770AF8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{664E78DA-C55B-46B7-A175-97E652770AF8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{664E78DA-C55B-46B7-A175-97E652770AF8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{36C78D4A-6189-40E8-8930-D88D352BD3C4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{36C78D4A-6189-40E8-8930-D88D352BD3C4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{36C78D4A-6189-40E8-8930-D88D352BD3C4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{36C78D4A-6189-40E8-8930-D88D352BD3C4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
