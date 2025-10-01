@@ -19,6 +19,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MathTest", "MathTest\MathTe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VoskAPP", "VoskAPP\VoskAPP.csproj", "{36C78D4A-6189-40E8-8930-D88D352BD3C4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VoskAPP.Tests", "VoskAPP.Tests\VoskAPP.Tests.csproj", "{4C6EB667-5C27-5122-A4F0-E63A9B972103}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -59,6 +61,10 @@ Global
 		{36C78D4A-6189-40E8-8930-D88D352BD3C4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{36C78D4A-6189-40E8-8930-D88D352BD3C4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{36C78D4A-6189-40E8-8930-D88D352BD3C4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4C6EB667-5C27-5122-A4F0-E63A9B972103}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4C6EB667-5C27-5122-A4F0-E63A9B972103}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4C6EB667-5C27-5122-A4F0-E63A9B972103}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4C6EB667-5C27-5122-A4F0-E63A9B972103}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

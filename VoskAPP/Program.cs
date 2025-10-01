@@ -26,54 +26,55 @@ class Program
         #region Whisper.net
 
 
-        //string outputWavPath = "temp.wav";
-        //WaveInEvent waveIn;
-        //WaveFileWriter writer;
+        string outputWavPath = "temp.wav";
+        WaveInEvent waveIn;
+        WaveFileWriter writer;
 
-        //Console.WriteLine("========== Whisper.net 語音辨識開始 ==========");
+        Console.WriteLine("========== Whisper.net 語音辨識開始 ==========");
 
-        //waveIn = new WaveInEvent();
-        //waveIn.DeviceNumber = 0;
-        //waveIn.WaveFormat = new WaveFormat(16000, 1);
-        //writer = new WaveFileWriter(outputWavPath, waveIn.WaveFormat);
+        waveIn = new WaveInEvent();
+        waveIn.DeviceNumber = 0;
+        waveIn.WaveFormat = new WaveFormat(16000, 1);
+        writer = new WaveFileWriter(outputWavPath, waveIn.WaveFormat);
 
-        //waveIn.DataAvailable += (s, e) =>
-        //{
-        //    writer.Write(e.Buffer, 0, e.BytesRecorded);
-        //};
+        waveIn.DataAvailable += (s, e) =>
+        {
+            writer.Write(e.Buffer, 0, e.BytesRecorded);
+        };
 
-        //waveIn.RecordingStopped += async (s, e) =>
-        //{
-        //    writer.Dispose();
-        //    waveIn.Dispose();
-        //    Console.WriteLine("錄音結束，開始辨識...");
+        waveIn.RecordingStopped += async (s, e) =>
+        {
+            writer.Dispose();
+            waveIn.Dispose();
+            Console.WriteLine("錄音結束，開始辨識...");
 
-        //    await RunWhisperAsync(outputWavPath, cancellationToken1);
-        //};
+            await RunWhisperAsync(outputWavPath, cancellationToken1);
+        };
 
-        //Console.WriteLine("開始錄音（按 Ctrl+C 停止錄音）...");
-        //waveIn.StartRecording();
-        //Console.CancelKeyPress += (s, e) =>
-        //{
-        //    waveIn.StopRecording();
-        //    e.Cancel = true;
-        //};
+        Console.WriteLine("開始錄音（按 Ctrl+C 停止錄音）...");
+        waveIn.StartRecording();
+        Console.CancelKeyPress += (s, e) =>
+        {
+            waveIn.StopRecording();
+            e.Cancel = true;
+        };
 
-        //Console.ReadKey();
-        //cancellationTokenSource1.Cancel();
-
-        //while (true) {
-        //}
-        #endregion
+        Console.ReadKey();
+        cancellationTokenSource1.Cancel();
 
         while (true)
         {
-            Console.WriteLine("請輸入文字");
-            string input = Console.ReadLine();
-            await GetChat(input);
-            //Console.ReadKey();
-            //cancellationTokenSource1.Cancel();
         }
+        #endregion
+
+        //while (true)
+        //{
+        //    Console.WriteLine("請輸入文字");
+        //    string input = Console.ReadLine();
+        //    await GetChat(input);
+        //    //Console.ReadKey();
+        //    //cancellationTokenSource1.Cancel();
+        //}
     }
 
     private static WaveInEvent Vosk()
