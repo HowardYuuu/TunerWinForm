@@ -16,7 +16,7 @@ jobs:
 
     strategy:
       matrix:
-        dotnet: [ '8.0', '7.0', '6.0' ]  # 可依專案需要調整
+        dotnet: [ '8.0' ]  # 可依專案需要調整
 
     steps:
       - name: Checkout
