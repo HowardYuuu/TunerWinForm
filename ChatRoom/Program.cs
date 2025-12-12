@@ -14,9 +14,22 @@ builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
     {
-        policy.AllowAnyOrigin()
-              .AllowAnyHeader()
-              .AllowAnyMethod();
+        // 開發環境設定：允許所有來源
+        // 生產環境應改為：policy.WithOrigins("https://yourdomain.com").AllowCredentials()
+        if (builder.Environment.IsDevelopment())
+        {
+            policy.AllowAnyOrigin()
+                  .AllowAnyHeader()
+                  .AllowAnyMethod();
+        }
+        else
+        {
+            // 生產環境：限制特定來源並啟用憑證
+            policy.WithOrigins("https://yourdomain.com")
+                  .AllowAnyHeader()
+                  .AllowAnyMethod()
+                  .AllowCredentials();
+        }
     });
 });
 

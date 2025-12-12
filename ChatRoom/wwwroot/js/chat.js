@@ -1,3 +1,7 @@
+// 常數定義
+const MAX_NICKNAME_LENGTH = 20;
+const MAX_MESSAGE_LENGTH = 500;
+
 // SignalR 連線設定
 let connection = null;
 let currentUser = null;
@@ -92,8 +96,8 @@ async function joinChat() {
         return;
     }
 
-    if (nickname.length > 20) {
-        showError("暱稱不可超過20個字元");
+    if (nickname.length > MAX_NICKNAME_LENGTH) {
+        showError(`暱稱不可超過${MAX_NICKNAME_LENGTH}個字元`);
         return;
     }
 
@@ -118,8 +122,8 @@ async function sendMessage() {
         return;
     }
 
-    if (message.length > 500) {
-        showError("訊息不可超過500個字元");
+    if (message.length > MAX_MESSAGE_LENGTH) {
+        showError(`訊息不可超過${MAX_MESSAGE_LENGTH}個字元`);
         return;
     }
 
@@ -158,7 +162,7 @@ function addMessage(sender, content, timestamp, isOwn = false) {
             <span class="message-sender">${escapeHtml(sender)}</span>
             <span class="message-time">${time}</span>
         </div>
-        <div class="message-content">${content}</div>
+        <div class="message-content">${escapeHtml(content)}</div>
     `;
 
     messagesList.appendChild(messageDiv);
@@ -218,15 +222,43 @@ function resetToLogin() {
 
 // 顯示錯誤訊息
 function showError(message) {
-    errorMessage.textContent = message;
-    setTimeout(() => {
+    // 清除舊的錯誤訊息與按鈕
+    errorMessage.innerHTML = '';
+    
+    // 建立訊息文字
+    const msgSpan = document.createElement('span');
+    msgSpan.textContent = message;
+    errorMessage.appendChild(msgSpan);
+    
+    // 建立關閉按鈕
+    const closeBtn = document.createElement('button');
+    closeBtn.textContent = '×';
+    closeBtn.setAttribute('aria-label', '關閉錯誤訊息');
+    closeBtn.style.marginLeft = '8px';
+    closeBtn.style.cursor = 'pointer';
+    closeBtn.style.border = 'none';
+    closeBtn.style.background = 'none';
+    closeBtn.style.fontSize = '20px';
+    closeBtn.style.color = '#ff6b6b';
+    closeBtn.addEventListener('click', clearError);
+    errorMessage.appendChild(closeBtn);
+    
+    // 延長自動清除時間（15 秒），並避免多重 timeout
+    if (window._errorTimeout) {
+        clearTimeout(window._errorTimeout);
+    }
+    window._errorTimeout = setTimeout(() => {
         clearError();
-    }, 5000);
+    }, 15000);
 }
 
 // 清除錯誤訊息
 function clearError() {
-    errorMessage.textContent = '';
+    errorMessage.innerHTML = '';
+    if (window._errorTimeout) {
+        clearTimeout(window._errorTimeout);
+        window._errorTimeout = null;
+    }
 }
 
 // 捲動到底部
@@ -275,20 +307,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 離開按鈕
     leaveBtn.addEventListener('click', leaveChat);
-
-    // 防止表單提交
-    document.querySelectorAll('input').forEach(input => {
-        input.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-            }
-        });
-    });
 });
 
 // 處理頁面關閉
-window.addEventListener('beforeunload', () => {
+window.addEventListener('beforeunload', (e) => {
     if (connection && connection.state === signalR.HubConnectionState.Connected) {
-        connection.invoke("LeaveChat");
+        // 使用同步方式確保離開通知送達
+        // 由於 SignalR 不支援同步調用，我們依賴 OnDisconnectedAsync 處理斷線
+        // 瀏覽器關閉時會自動觸發 WebSocket 斷線，伺服器會收到通知
     }
 });

@@ -9,6 +9,12 @@ public class UserConnectionService
 
     public bool AddUser(string connectionId, string nickname)
     {
+        // 檢查暱稱是否已存在
+        if (_connections.Values.Any(u => u.Nickname == nickname))
+        {
+            return false;
+        }
+
         var userInfo = new UserInfo
         {
             ConnectionId = connectionId,
