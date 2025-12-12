@@ -69,15 +69,75 @@ public class ChatHub : Hub
             // 編碼訊息以防止 XSS
             var sanitizedMessage = WebUtility.HtmlEncode(message.Trim());
 
+            var chatMessage = new ChatMessage
+            {
+                MessageId = Guid.NewGuid().ToString(),
+                Sender = userInfo.Nickname,
+                Content = sanitizedMessage,
+                Timestamp = DateTime.Now,
+                Type = MessageType.Text
+            };
+
+            // 儲存訊息
+            _userConnectionService.AddMessage(chatMessage);
+
             // 廣播訊息給所有用戶
             await Clients.All.SendAsync("ReceiveMessage", 
-                userInfo.Nickname, 
-                sanitizedMessage, 
-                DateTime.Now);
+                chatMessage.MessageId,
+                chatMessage.Sender, 
+                chatMessage.Content, 
+                chatMessage.Timestamp,
+                chatMessage.Type.ToString());
         }
         else
         {
             await Clients.Caller.SendAsync("Error", "請先加入聊天室");
+        }
+    }
+
+    public async Task SendImageMessage(string imageData)
+    {
+        var userInfo = _userConnectionService.GetUser(Context.ConnectionId);
+        if (userInfo != null)
+        {
+            var chatMessage = new ChatMessage
+            {
+                MessageId = Guid.NewGuid().ToString(),
+                Sender = userInfo.Nickname,
+                Content = "",
+                Timestamp = DateTime.Now,
+                Type = MessageType.Image,
+                ImageData = imageData
+            };
+
+            // 儲存訊息
+            _userConnectionService.AddMessage(chatMessage);
+
+            // 廣播圖片訊息給所有用戶
+            await Clients.All.SendAsync("ReceiveMessage", 
+                chatMessage.MessageId,
+                chatMessage.Sender, 
+                chatMessage.Content, 
+                chatMessage.Timestamp,
+                chatMessage.Type.ToString(),
+                chatMessage.ImageData);
+        }
+        else
+        {
+            await Clients.Caller.SendAsync("Error", "請先加入聊天室");
+        }
+    }
+
+    public async Task MarkMessageAsRead(string messageId)
+    {
+        if (_userConnectionService.MarkMessageAsRead(messageId, Context.ConnectionId))
+        {
+            var message = _userConnectionService.GetMessage(messageId);
+            if (message != null)
+            {
+                // 通知訊息發送者已讀狀態更新
+                await Clients.All.SendAsync("MessageReadStatusUpdated", messageId, message.ReadBy.Count);
+            }
         }
     }
 

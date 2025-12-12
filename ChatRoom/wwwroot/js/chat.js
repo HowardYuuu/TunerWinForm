@@ -18,6 +18,14 @@ const messagesList = document.getElementById('messagesList');
 const usersList = document.getElementById('usersList');
 const onlineCount = document.getElementById('onlineCount');
 const errorMessage = document.getElementById('errorMessage');
+const emojiBtn = document.getElementById('emojiBtn');
+const emojiPicker = document.getElementById('emojiPicker');
+const emojiList = document.getElementById('emojiList');
+const imageBtn = document.getElementById('imageBtn');
+const imageInput = document.getElementById('imageInput');
+
+// Emoji 列表
+const emojis = ['😊', '😂', '😍', '🥰', '😎', '🤔', '😮', '😢', '😡', '👍', '👎', '👏', '🙏', '💪', '🎉', '❤️', '💯', '🔥', '⭐', '✨', '🌟', '💡', '📷', '🎵', '🎮', '⚽', '🍕', '🍔', '🎂', '☕', '🌈', '🌸'];
 
 // 初始化 SignalR 連線
 function initializeConnection() {
@@ -33,8 +41,22 @@ function initializeConnection() {
 // 註冊 SignalR 事件處理器
 function registerEventHandlers() {
     // 接收訊息
-    connection.on("ReceiveMessage", (sender, message, timestamp) => {
-        addMessage(sender, message, timestamp, sender === currentUser);
+    connection.on("ReceiveMessage", (messageId, sender, message, timestamp, type, imageData) => {
+        addMessage(messageId, sender, message, timestamp, sender === currentUser, type, imageData);
+        
+        // 如果不是自己的訊息，標記為已讀
+        if (sender !== currentUser) {
+            setTimeout(() => {
+                connection.invoke("MarkMessageAsRead", messageId).catch(err => {
+                    console.error("標記已讀錯誤:", err);
+                });
+            }, 1000);
+        }
+    });
+
+    // 訊息已讀狀態更新
+    connection.on("MessageReadStatusUpdated", (messageId, readCount) => {
+        updateMessageReadStatus(messageId, readCount);
     });
 
     // 用戶加入
@@ -137,6 +159,16 @@ async function sendMessage() {
     }
 }
 
+// 發送圖片
+async function sendImage(imageData) {
+    try {
+        await connection.invoke("SendImageMessage", imageData);
+    } catch (err) {
+        console.error("發送圖片錯誤:", err);
+        showError("圖片發送失敗，請稍後再試");
+    }
+}
+
 // 離開聊天室
 async function leaveChat() {
     if (confirm("確定要離開聊天室嗎？")) {
@@ -151,29 +183,90 @@ async function leaveChat() {
 }
 
 // 新增訊息到列表
-function addMessage(sender, content, timestamp, isOwn = false) {
+function addMessage(messageId, sender, content, timestamp, isOwn = false, type = 'Text', imageData = null) {
     const messageDiv = document.createElement('div');
     messageDiv.className = `message ${isOwn ? 'own' : ''}`;
+    messageDiv.dataset.messageId = messageId;
 
     const time = formatTime(new Date(timestamp));
 
-    messageDiv.innerHTML = `
-        <div class="message-header">
-            <span class="message-sender">${escapeHtml(sender)}</span>
-            <span class="message-time">${time}</span>
-        </div>
-        <div class="message-content">${escapeHtml(content)}</div>
-    `;
+    // 建立訊息標題
+    const headerDiv = document.createElement('div');
+    headerDiv.className = 'message-header';
+    
+    const senderSpan = document.createElement('span');
+    senderSpan.className = 'message-sender';
+    senderSpan.textContent = sender;
+    
+    const timeSpan = document.createElement('span');
+    timeSpan.className = 'message-time';
+    timeSpan.textContent = time;
+    
+    headerDiv.appendChild(senderSpan);
+    headerDiv.appendChild(timeSpan);
 
+    // 建立訊息內容包裝器
+    const wrapperDiv = document.createElement('div');
+    wrapperDiv.className = 'message-content-wrapper';
+
+    // 建立訊息內容
+    const contentDiv = document.createElement('div');
+    contentDiv.className = 'message-content';
+    
+    if (type === 'Image' && imageData) {
+        const img = document.createElement('img');
+        img.src = imageData;
+        img.alt = '圖片';
+        img.onclick = () => window.open(img.src);
+        contentDiv.appendChild(img);
+    } else {
+        // 使用 textContent 來顯示內容，這樣可以正確顯示 emoji
+        contentDiv.textContent = content;
+    }
+    
+    wrapperDiv.appendChild(contentDiv);
+
+    // 如果是自己的訊息，添加狀態指示
+    if (isOwn) {
+        const statusSpan = document.createElement('span');
+        statusSpan.className = 'message-status';
+        statusSpan.dataset.status = '';
+        statusSpan.textContent = '傳送中...';
+        wrapperDiv.appendChild(statusSpan);
+    }
+
+    messageDiv.appendChild(headerDiv);
+    messageDiv.appendChild(wrapperDiv);
     messagesList.appendChild(messageDiv);
     scrollToBottom();
+}
+
+// 更新訊息已讀狀態
+function updateMessageReadStatus(messageId, readCount) {
+    const messageDiv = document.querySelector(`[data-message-id="${messageId}"]`);
+    if (messageDiv) {
+        const statusSpan = messageDiv.querySelector('[data-status]');
+        if (statusSpan) {
+            if (readCount > 0) {
+                statusSpan.textContent = `已讀 ${readCount}`;
+                statusSpan.style.color = '#4A90E2';
+            } else {
+                statusSpan.textContent = '已送出';
+            }
+        }
+    }
 }
 
 // 新增系統訊息
 function addSystemMessage(message) {
     const messageDiv = document.createElement('div');
     messageDiv.className = 'message system';
-    messageDiv.innerHTML = `<div class="message-content">${escapeHtml(message)}</div>`;
+    
+    const contentDiv = document.createElement('div');
+    contentDiv.className = 'message-content';
+    contentDiv.textContent = message;
+    
+    messageDiv.appendChild(contentDiv);
     messagesList.appendChild(messageDiv);
     scrollToBottom();
 }
@@ -188,11 +281,16 @@ function updateUsersList(users) {
         
         const time = formatTime(new Date(user.connectedAt));
         
-        li.innerHTML = `
-            <span class="user-name">${escapeHtml(user.nickname)}</span>
-            <span class="user-time">${time}</span>
-        `;
+        const nameSpan = document.createElement('span');
+        nameSpan.className = 'user-name';
+        nameSpan.textContent = user.nickname;
         
+        const timeSpan = document.createElement('span');
+        timeSpan.className = 'user-time';
+        timeSpan.textContent = time;
+        
+        li.appendChild(nameSpan);
+        li.appendChild(timeSpan);
         usersList.appendChild(li);
     });
 }
@@ -280,10 +378,72 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
+// 初始化 Emoji 選擇器
+function initializeEmojiPicker() {
+    emojis.forEach(emoji => {
+        const emojiSpan = document.createElement('span');
+        emojiSpan.className = 'emoji-item';
+        emojiSpan.textContent = emoji;
+        emojiSpan.onclick = () => {
+            messageInput.value += emoji;
+            emojiPicker.style.display = 'none';
+            messageInput.focus();
+        };
+        emojiList.appendChild(emojiSpan);
+    });
+}
+
+// 處理圖片上傳
+function handleImageUpload(event) {
+    const file = event.target.files[0];
+    if (file) {
+        // 檢查檔案大小（限制 5MB）
+        if (file.size > 5 * 1024 * 1024) {
+            showError('圖片大小不可超過 5MB');
+            return;
+        }
+
+        // 檢查檔案類型
+        if (!file.type.startsWith('image/')) {
+            showError('只能上傳圖片檔案');
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const imageData = e.target.result;
+            sendImage(imageData);
+        };
+        reader.readAsDataURL(file);
+    }
+    // 清空 input，允許重複上傳相同檔案
+    event.target.value = '';
+}
+
+// 處理貼上圖片
+function handlePaste(event) {
+    const items = event.clipboardData.items;
+    for (let i = 0; i < items.length; i++) {
+        if (items[i].type.indexOf('image') !== -1) {
+            event.preventDefault();
+            const blob = items[i].getAsFile();
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                sendImage(e.target.result);
+            };
+            reader.readAsDataURL(blob);
+            break;
+        }
+    }
+}
+
 // 事件監聽器
 document.addEventListener('DOMContentLoaded', () => {
     // 初始化連線
     initializeConnection();
+    
+    // 初始化 Emoji 選擇器
+    initializeEmojiPicker();
 
     // 加入按鈕
     joinBtn.addEventListener('click', joinChat);
@@ -304,6 +464,29 @@ document.addEventListener('DOMContentLoaded', () => {
             sendMessage();
         }
     });
+
+    // 貼上圖片
+    messageInput.addEventListener('paste', handlePaste);
+
+    // Emoji 按鈕
+    emojiBtn.addEventListener('click', () => {
+        emojiPicker.style.display = emojiPicker.style.display === 'none' ? 'block' : 'none';
+    });
+
+    // 點擊其他地方關閉 Emoji 選擇器
+    document.addEventListener('click', (e) => {
+        if (!emojiBtn.contains(e.target) && !emojiPicker.contains(e.target)) {
+            emojiPicker.style.display = 'none';
+        }
+    });
+
+    // 圖片按鈕
+    imageBtn.addEventListener('click', () => {
+        imageInput.click();
+    });
+
+    // 圖片上傳
+    imageInput.addEventListener('change', handleImageUpload);
 
     // 離開按鈕
     leaveBtn.addEventListener('click', leaveChat);

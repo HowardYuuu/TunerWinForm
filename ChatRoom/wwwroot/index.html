@@ -32,9 +32,17 @@
                     
                     <!-- 訊息輸入區 -->
                     <div class="input-area">
+                        <button id="emojiBtn" class="btn btn-icon" title="選擇表情符號">😊</button>
+                        <button id="imageBtn" class="btn btn-icon" title="上傳圖片">📷</button>
+                        <input type="file" id="imageInput" accept="image/*" style="display: none;" />
                         <input type="text" id="messageInput" placeholder="輸入訊息..." maxlength="500" />
                         <button id="sendBtn" class="btn btn-send">發送</button>
                     </div>
+                    <!-- Emoji 選擇器 -->
+                    <div id="emojiPicker" class="emoji-picker" style="display: none;">
+                        <div class="emoji-list" id="emojiList"></div>
+                    </div>
+                
                 </div>
 
                 <!-- 側邊欄 - 在線用戶列表 -->
@@ -53,7 +61,7 @@
     </div>
 
     <!-- SignalR 客戶端庫 -->
-    <script src="https://cdn.jsdelivr.net/npm/@microsoft/signalr@7.0.14/dist/browser/signalr.min.js"></script>
+    <script src="/lib/signalr/signalr.min.js"></script>
     <!-- 應用程式腳本 -->
     <script src="/js/chat.js"></script>
 </body>

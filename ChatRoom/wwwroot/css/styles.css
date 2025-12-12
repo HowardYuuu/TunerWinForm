@@ -97,6 +97,7 @@ body {
     display: flex;
     flex-direction: column;
     border-right: 1px solid #e0e0e0;
+    position: relative;
 }
 
 .messages-list {
@@ -110,6 +111,9 @@ body {
 .message {
     margin-bottom: 15px;
     animation: fadeIn 0.3s ease-in;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
 }
 
 @keyframes fadeIn {
@@ -140,24 +144,61 @@ body {
     color: #999;
 }
 
+.message-content-wrapper {
+    display: flex;
+    align-items: flex-end;
+    gap: 5px;
+    max-width: 80%;
+}
+
 .message-content {
     background: white;
     padding: 10px 15px;
     border-radius: 8px;
-    display: inline-block;
-    max-width: 80%;
     word-wrap: break-word;
     box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    position: relative;
 }
 
-/* 自己的訊息 */
+.message-content img {
+    max-width: 300px;
+    max-height: 300px;
+    border-radius: 8px;
+    margin-top: 5px;
+    cursor: pointer;
+}
+
+.message-status {
+    font-size: 11px;
+    color: #999;
+    white-space: nowrap;
+}
+
+/* 自己的訊息 - 顯示在右側 */
+.message.own {
+    align-items: flex-end;
+}
+
+.message.own .message-header {
+    flex-direction: row-reverse;
+}
+
+.message.own .message-sender {
+    margin-right: 0;
+    margin-left: 10px;
+}
+
+.message.own .message-content-wrapper {
+    flex-direction: row-reverse;
+}
+
 .message.own .message-content {
     background: #4A90E2;
     color: white;
 }
 
-.message.own .message-sender {
-    color: #333;
+.message.own .message-status {
+    color: #666;
 }
 
 /* 系統訊息 */
@@ -178,21 +219,79 @@ body {
     padding: 15px;
     background: white;
     border-top: 1px solid #e0e0e0;
+    align-items: center;
+    gap: 8px;
 }
 
-.input-area input {
+.input-area input[type="text"] {
     flex: 1;
     padding: 12px 15px;
     border: 2px solid #e0e0e0;
     border-radius: 25px;
     font-size: 14px;
-    margin-right: 10px;
     transition: border-color 0.3s;
 }
 
-.input-area input:focus {
+.input-area input[type="text"]:focus {
     outline: none;
     border-color: #4A90E2;
+}
+
+/* Emoji 和圖片按鈕 */
+.btn-icon {
+    background: #f0f0f0;
+    color: #666;
+    padding: 8px 12px;
+    border-radius: 50%;
+    font-size: 20px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-icon:hover {
+    background: #e0e0e0;
+    transform: scale(1.1);
+}
+
+/* Emoji 選擇器 */
+.emoji-picker {
+    position: absolute;
+    bottom: 70px;
+    left: 20px;
+    background: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    padding: 10px;
+    z-index: 1000;
+    max-width: 320px;
+}
+
+.emoji-list {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 5px;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.emoji-item {
+    font-size: 24px;
+    padding: 8px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background 0.2s;
+    text-align: center;
+}
+
+.emoji-item:hover {
+    background: #f0f0f0;
 }
 
 /* 側邊欄 */
