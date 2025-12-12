@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.SignalR;
 using ChatRoom.Services;
 using ChatRoom.Models;
-using System.Net;
 
 namespace ChatRoom.Hubs;
 
@@ -26,23 +25,23 @@ public class ChatHub : Hub
             return;
         }
 
-        // 編碼暱稱以防止 XSS
-        var sanitizedNickname = WebUtility.HtmlEncode(nickname.Trim());
+        // 不需要在後端編碼，因為前端使用 textContent 來安全顯示
+        var trimmedNickname = nickname.Trim();
 
         // 新增用戶
-        if (_userConnectionService.AddUser(Context.ConnectionId, sanitizedNickname))
+        if (_userConnectionService.AddUser(Context.ConnectionId, trimmedNickname))
         {
             // 通知該用戶連線成功
-            await Clients.Caller.SendAsync("JoinedSuccessfully", sanitizedNickname);
+            await Clients.Caller.SendAsync("JoinedSuccessfully", trimmedNickname);
 
             // 取得在線人數
             var onlineCount = _userConnectionService.GetOnlineCount();
 
             // 通知所有用戶有新用戶加入
-            await Clients.All.SendAsync("UserJoined", sanitizedNickname, onlineCount);
+            await Clients.All.SendAsync("UserJoined", trimmedNickname, onlineCount);
 
             // 發送系統訊息
-            await Clients.All.SendAsync("SystemMessage", $"{sanitizedNickname} 加入了聊天室");
+            await Clients.All.SendAsync("SystemMessage", $"{trimmedNickname} 加入了聊天室");
 
             // 更新在線用戶列表
             var users = _userConnectionService.GetAllUsers();
@@ -66,14 +65,14 @@ public class ChatHub : Hub
         var userInfo = _userConnectionService.GetUser(Context.ConnectionId);
         if (userInfo != null)
         {
-            // 編碼訊息以防止 XSS
-            var sanitizedMessage = WebUtility.HtmlEncode(message.Trim());
+            // 不需要在後端編碼，因為前端使用 textContent 來安全顯示
+            var trimmedMessage = message.Trim();
 
             var chatMessage = new ChatMessage
             {
                 MessageId = Guid.NewGuid().ToString(),
                 Sender = userInfo.Nickname,
-                Content = sanitizedMessage,
+                Content = trimmedMessage,
                 Timestamp = DateTime.Now,
                 Type = MessageType.Text
             };
