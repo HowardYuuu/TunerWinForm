@@ -23,6 +23,13 @@ const emojiPicker = document.getElementById('emojiPicker');
 const emojiList = document.getElementById('emojiList');
 const imageBtn = document.getElementById('imageBtn');
 const imageInput = document.getElementById('imageInput');
+const imagePreview = document.getElementById('imagePreview');
+const previewImage = document.getElementById('previewImage');
+const sendImageBtn = document.getElementById('sendImageBtn');
+const cancelPreviewBtn = document.getElementById('cancelPreviewBtn');
+
+// 當前預覽的圖片數據
+let currentImageData = null;
 
 // Emoji 列表
 const emojis = ['😊', '😂', '😍', '🥰', '😎', '🤔', '😮', '😢', '😡', '👍', '👎', '👏', '🙏', '💪', '🎉', '❤️', '💯', '🔥', '⭐', '✨', '🌟', '💡', '📷', '🎵', '🎮', '⚽', '🍕', '🍔', '🎂', '☕', '🌈', '🌸'];
@@ -393,6 +400,29 @@ function initializeEmojiPicker() {
     });
 }
 
+// 顯示圖片預覽
+function showImagePreview(imageData) {
+    currentImageData = imageData;
+    previewImage.src = imageData;
+    imagePreview.style.display = 'block';
+    emojiPicker.style.display = 'none';
+}
+
+// 隱藏圖片預覽
+function hideImagePreview() {
+    imagePreview.style.display = 'none';
+    currentImageData = null;
+    imageInput.value = '';
+}
+
+// 發送預覽的圖片
+async function sendPreviewedImage() {
+    if (currentImageData) {
+        await sendImage(currentImageData);
+        hideImagePreview();
+    }
+}
+
 // 處理圖片上傳
 function handleImageUpload(event) {
     const file = event.target.files[0];
@@ -400,24 +430,23 @@ function handleImageUpload(event) {
         // 檢查檔案大小（限制 5MB）
         if (file.size > 5 * 1024 * 1024) {
             showError('圖片大小不可超過 5MB');
+            imageInput.value = '';
             return;
         }
 
         // 檢查檔案類型
         if (!file.type.startsWith('image/')) {
             showError('只能上傳圖片檔案');
+            imageInput.value = '';
             return;
         }
 
         const reader = new FileReader();
         reader.onload = (e) => {
-            const imageData = e.target.result;
-            sendImage(imageData);
+            showImagePreview(e.target.result);
         };
         reader.readAsDataURL(file);
     }
-    // 清空 input，允許重複上傳相同檔案
-    event.target.value = '';
 }
 
 // 處理貼上圖片
@@ -427,9 +456,16 @@ function handlePaste(event) {
         if (items[i].type.indexOf('image') !== -1) {
             event.preventDefault();
             const blob = items[i].getAsFile();
+            
+            // 檢查檔案大小（限制 5MB）
+            if (blob.size > 5 * 1024 * 1024) {
+                showError('圖片大小不可超過 5MB');
+                return;
+            }
+            
             const reader = new FileReader();
             reader.onload = (e) => {
-                sendImage(e.target.result);
+                showImagePreview(e.target.result);
             };
             reader.readAsDataURL(blob);
             break;
@@ -487,6 +523,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 圖片上傳
     imageInput.addEventListener('change', handleImageUpload);
+
+    // 圖片預覽 - 發送按鈕
+    sendImageBtn.addEventListener('click', sendPreviewedImage);
+
+    // 圖片預覽 - 取消按鈕
+    cancelPreviewBtn.addEventListener('click', hideImagePreview);
 
     // 離開按鈕
     leaveBtn.addEventListener('click', leaveChat);

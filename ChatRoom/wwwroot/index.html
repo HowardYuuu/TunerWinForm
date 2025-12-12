@@ -30,6 +30,20 @@
                 <div class="chat-area">
                     <div id="messagesList" class="messages-list"></div>
                     
+                    <!-- 圖片預覽區 -->
+                    <div id="imagePreview" class="image-preview" style="display: none;">
+                        <div class="preview-header">
+                            <span>圖片預覽</span>
+                            <button id="cancelPreviewBtn" class="btn-close">×</button>
+                        </div>
+                        <div class="preview-content">
+                            <img id="previewImage" src="" alt="預覽圖片" />
+                        </div>
+                        <div class="preview-footer">
+                            <button id="sendImageBtn" class="btn btn-primary">發送圖片</button>
+                        </div>
+                    </div>
+                    
                     <!-- 訊息輸入區 -->
                     <div class="input-area">
                         <button id="emojiBtn" class="btn btn-icon" title="選擇表情符號">😊</button>
