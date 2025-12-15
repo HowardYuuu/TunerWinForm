@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  chatroom:
+    build:
+      context: ../
+      dockerfile: ChatRoom/Dockerfile
+    container_name: chatroom-app
+    ports:
+      - "5180:8080"
+      - "5181:8081"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:8080
+      - ASPNETCORE_HTTP_PORTS=8080
+    volumes:
+      # 如果需要持久化日誌，可以掛載卷
+      - chatroom-logs:/app/logs
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - chatroom-network
+
+volumes:
+  chatroom-logs:
+    driver: local
+
+networks:
+  chatroom-network:
+    driver: bridge

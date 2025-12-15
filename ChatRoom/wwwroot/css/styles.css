@@ -1,0 +1,542 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.container {
+    width: 100%;
+    max-width: 1200px;
+    height: 90vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* 標題區 */
+.header {
+    background: white;
+    padding: 20px;
+    border-radius: 10px 10px 0 0;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+.header h1 {
+    color: #4A90E2;
+    font-size: 28px;
+}
+
+/* 連線區域 */
+.login-section {
+    background: white;
+    border-radius: 0 0 10px 10px;
+    padding: 60px 20px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex: 1;
+}
+
+.login-box {
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+}
+
+.login-box h2 {
+    color: #333;
+    margin-bottom: 30px;
+    font-size: 24px;
+}
+
+.login-box input {
+    width: 100%;
+    padding: 15px;
+    margin-bottom: 20px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: border-color 0.3s;
+}
+
+.login-box input:focus {
+    outline: none;
+    border-color: #4A90E2;
+}
+
+/* 聊天區域 */
+.chat-section {
+    background: white;
+    border-radius: 0 0 10px 10px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.main-content {
+    display: flex;
+    height: 100%;
+    overflow: hidden;
+}
+
+.chat-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid #e0e0e0;
+    position: relative;
+}
+
+.messages-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    background: #F5F7FA;
+}
+
+/* 訊息樣式 */
+.message {
+    margin-bottom: 15px;
+    animation: fadeIn 0.3s ease-in;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.message-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.message-sender {
+    font-weight: bold;
+    color: #4A90E2;
+    margin-right: 10px;
+}
+
+.message-time {
+    font-size: 12px;
+    color: #999;
+}
+
+.message-content-wrapper {
+    display: flex;
+    align-items: flex-end;
+    gap: 5px;
+    max-width: 80%;
+}
+
+.message-content {
+    background: white;
+    padding: 10px 15px;
+    border-radius: 8px;
+    word-wrap: break-word;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    position: relative;
+}
+
+.message-content img {
+    max-width: 300px;
+    max-height: 300px;
+    border-radius: 8px;
+    margin-top: 5px;
+    cursor: pointer;
+}
+
+.message-status {
+    font-size: 11px;
+    color: #999;
+    white-space: nowrap;
+}
+
+/* 自己的訊息 - 顯示在右側 */
+.message.own {
+    align-items: flex-end;
+}
+
+.message.own .message-header {
+    flex-direction: row-reverse;
+}
+
+.message.own .message-sender {
+    margin-right: 0;
+    margin-left: 10px;
+}
+
+.message.own .message-content-wrapper {
+    flex-direction: row-reverse;
+}
+
+.message.own .message-content {
+    background: #4A90E2;
+    color: white;
+}
+
+.message.own .message-status {
+    color: #666;
+}
+
+/* 系統訊息 */
+.message.system {
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+}
+
+.message.system .message-content {
+    background: #50E3C2;
+    color: white;
+    font-size: 14px;
+    padding: 8px 12px;
+    display: inline-block;
+    margin: 0 auto;
+}
+
+/* 輸入區域 */
+.input-area {
+    display: flex;
+    padding: 15px;
+    background: white;
+    border-top: 1px solid #e0e0e0;
+    align-items: center;
+    gap: 8px;
+}
+
+.input-area input[type="text"] {
+    flex: 1;
+    padding: 12px 15px;
+    border: 2px solid #e0e0e0;
+    border-radius: 25px;
+    font-size: 14px;
+    transition: border-color 0.3s;
+}
+
+.input-area input[type="text"]:focus {
+    outline: none;
+    border-color: #4A90E2;
+}
+
+/* Emoji 和圖片按鈕 */
+.btn-icon {
+    background: #f0f0f0;
+    color: #666;
+    padding: 8px 12px;
+    border-radius: 50%;
+    font-size: 20px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-icon:hover {
+    background: #e0e0e0;
+    transform: scale(1.1);
+}
+
+/* 圖片預覽 */
+.image-preview {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    z-index: 2000;
+    max-width: 500px;
+    width: 90%;
+}
+
+.preview-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    border-bottom: 1px solid #e0e0e0;
+    font-weight: bold;
+    color: #333;
+}
+
+.btn-close {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #999;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-close:hover {
+    color: #ff6b6b;
+}
+
+.preview-content {
+    padding: 20px;
+    text-align: center;
+    max-height: 400px;
+    overflow: auto;
+}
+
+.preview-content img {
+    max-width: 100%;
+    max-height: 350px;
+    border-radius: 8px;
+}
+
+.preview-footer {
+    padding: 15px 20px;
+    border-top: 1px solid #e0e0e0;
+    text-align: right;
+}
+
+/* Emoji 選擇器 */
+.emoji-picker {
+    position: absolute;
+    bottom: 70px;
+    left: 20px;
+    background: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    padding: 10px;
+    z-index: 1000;
+    max-width: 320px;
+}
+
+.emoji-list {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 5px;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.emoji-item {
+    font-size: 24px;
+    padding: 8px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background 0.2s;
+    text-align: center;
+}
+
+.emoji-item:hover {
+    background: #f0f0f0;
+}
+
+/* 側邊欄 */
+.sidebar {
+    width: 300px;
+    display: flex;
+    flex-direction: column;
+    background: #F5F7FA;
+}
+
+.sidebar-header {
+    padding: 20px;
+    background: white;
+    border-bottom: 1px solid #e0e0e0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.sidebar-header h3 {
+    color: #333;
+    font-size: 18px;
+}
+
+.online-count {
+    background: #4A90E2;
+    color: white;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.users-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 10px;
+    list-style: none;
+}
+
+.user-item {
+    padding: 12px 15px;
+    margin-bottom: 8px;
+    background: white;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+.user-item::before {
+    content: "●";
+    color: #50E3C2;
+    font-size: 20px;
+    margin-right: 10px;
+}
+
+.user-name {
+    font-weight: 500;
+    color: #333;
+}
+
+.user-time {
+    font-size: 11px;
+    color: #999;
+    margin-left: auto;
+}
+
+.sidebar-footer {
+    padding: 15px;
+    background: white;
+    border-top: 1px solid #e0e0e0;
+}
+
+/* 按鈕樣式 */
+.btn {
+    padding: 12px 30px;
+    border: none;
+    border-radius: 25px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    outline: none;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.btn:active {
+    transform: translateY(0);
+}
+
+.btn-primary {
+    background: #4A90E2;
+    color: white;
+    width: 100%;
+}
+
+.btn-primary:hover {
+    background: #3a7bc8;
+}
+
+.btn-send {
+    background: #50E3C2;
+    color: white;
+    padding: 12px 25px;
+}
+
+.btn-send:hover {
+    background: #40d3b2;
+}
+
+.btn-danger {
+    background: #ff6b6b;
+    color: white;
+    width: 100%;
+}
+
+.btn-danger:hover {
+    background: #ee5a52;
+}
+
+/* 錯誤訊息 */
+.error-message {
+    color: #ff6b6b;
+    margin-top: 10px;
+    font-size: 14px;
+    min-height: 20px;
+}
+
+/* 捲軸樣式 */
+.messages-list::-webkit-scrollbar,
+.users-list::-webkit-scrollbar {
+    width: 8px;
+}
+
+.messages-list::-webkit-scrollbar-track,
+.users-list::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.messages-list::-webkit-scrollbar-thumb,
+.users-list::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+.messages-list::-webkit-scrollbar-thumb:hover,
+.users-list::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* 響應式設計 */
+@media (max-width: 768px) {
+    .container {
+        height: 100vh;
+    }
+
+    .main-content {
+        flex-direction: column;
+    }
+
+    .chat-area {
+        border-right: none;
+        border-bottom: 1px solid #e0e0e0;
+    }
+
+    .sidebar {
+        width: 100%;
+        max-height: 200px;
+    }
+
+    .header h1 {
+        font-size: 20px;
+    }
+
+    .message-content {
+        max-width: 90%;
+    }
+}

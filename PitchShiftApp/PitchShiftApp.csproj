@@ -9,7 +9,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="HIC.System.Windows.Forms.DataVisualization" Version="1.0.1" />
     <PackageReference Include="NAudio" Version="2.2.1" />
     <PackageReference Include="NWaves" Version="0.9.6" />
   </ItemGroup>

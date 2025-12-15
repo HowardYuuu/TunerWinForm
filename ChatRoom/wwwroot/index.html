@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>即時聊天室</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- 標題區 -->
+        <header class="header">
+            <h1>💬 即時聊天室</h1>
+        </header>
+
+        <!-- 連線區域 -->
+        <div id="loginSection" class="login-section">
+            <div class="login-box">
+                <h2>歡迎來到聊天室</h2>
+                <input type="text" id="nicknameInput" placeholder="請輸入您的暱稱" maxlength="20" />
+                <button id="joinBtn" class="btn btn-primary">加入聊天室</button>
+                <p id="errorMessage" class="error-message"></p>
+            </div>
+        </div>
+
+        <!-- 主要聊天區域 -->
+        <div id="chatSection" class="chat-section" style="display: none;">
+            <div class="main-content">
+                <!-- 聊天訊息區 -->
+                <div class="chat-area">
+                    <div id="messagesList" class="messages-list"></div>
+                    
+                    <!-- 圖片預覽區 -->
+                    <div id="imagePreview" class="image-preview" style="display: none;">
+                        <div class="preview-header">
+                            <span>圖片預覽</span>
+                            <button id="cancelPreviewBtn" class="btn-close">×</button>
+                        </div>
+                        <div class="preview-content">
+                            <img id="previewImage" src="" alt="預覽圖片" />
+                        </div>
+                        <div class="preview-footer">
+                            <button id="sendImageBtn" class="btn btn-primary">發送圖片</button>
+                        </div>
+                    </div>
+                    
+                    <!-- 訊息輸入區 -->
+                    <div class="input-area">
+                        <button id="emojiBtn" class="btn btn-icon" title="選擇表情符號">😊</button>
+                        <button id="imageBtn" class="btn btn-icon" title="上傳圖片">📷</button>
+                        <input type="file" id="imageInput" accept="image/*" style="display: none;" />
+                        <input type="text" id="messageInput" placeholder="輸入訊息..." maxlength="500" />
+                        <button id="sendBtn" class="btn btn-send">發送</button>
+                    </div>
+                    <!-- Emoji 選擇器 -->
+                    <div id="emojiPicker" class="emoji-picker" style="display: none;">
+                        <div class="emoji-list" id="emojiList"></div>
+                    </div>
+                
+                </div>
+
+                <!-- 側邊欄 - 在線用戶列表 -->
+                <aside class="sidebar">
+                    <div class="sidebar-header">
+                        <h3>在線用戶</h3>
+                        <span id="onlineCount" class="online-count">0</span>
+                    </div>
+                    <ul id="usersList" class="users-list"></ul>
+                    <div class="sidebar-footer">
+                        <button id="leaveBtn" class="btn btn-danger">離開聊天室</button>
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </div>
+
+    <!-- SignalR 客戶端庫 -->
+    <script src="/lib/signalr/signalr.min.js"></script>
+    <!-- 應用程式腳本 -->
+    <script src="/js/chat.js"></script>
+</body>
+</html>
