@@ -28,11 +28,37 @@
 
 ## 快速開始
 
-### 環境需求
+### 方法 1：使用 Docker（推薦）
+
+#### 環境需求
+- Docker 20.10 或更新版本
+- Docker Compose 1.29 或更新版本
+
+#### 執行步驟
+
+**Linux / macOS:**
+```bash
+cd ChatRoom
+./docker-run.sh start
+```
+
+**Windows:**
+```cmd
+cd ChatRoom
+docker-run.bat start
+```
+
+應用程式將在 `http://localhost:5180` 上運行。
+
+詳細的 Docker 使用說明請參考 [DOCKER.md](./DOCKER.md)
+
+### 方法 2：本地執行
+
+#### 環境需求
 - .NET 8.0 SDK
 - 現代瀏覽器（Chrome, Firefox, Edge）
 
-### 執行步驟
+#### 執行步驟
 
 1. **還原套件**
 ```bash

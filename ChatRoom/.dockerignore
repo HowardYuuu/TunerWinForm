@@ -1,0 +1,90 @@
+# .NET Core 建置產物
+bin/
+obj/
+out/
+*.dll
+*.exe
+*.pdb
+
+# IDE 和編輯器設定
+.vs/
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# 測試結果
+TestResults/
+*.trx
+*.coverage
+
+# NuGet 套件
+*.nupkg
+*.snupkg
+packages/
+!**/packages/build/
+
+# ASP.NET Scaffolding
+ScaffoldingReadMe.txt
+
+# 使用者特定檔案
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# 日誌檔案
+*.log
+logs/
+
+# 臨時檔案
+*_i.c
+*_p.c
+*_h.h
+*.ilk
+*.meta
+*.obj
+*.iobj
+*.pch
+*.ipdb
+*.pgc
+*.pgd
+*.rsp
+*.sbr
+*.tlb
+*.tli
+*.tlh
+*.tmp
+*.tmp_proj
+*.vspscc
+*.vssscc
+.builds
+*.pidb
+*.svclog
+*.scc
+
+# Docker 檔案
+Dockerfile*
+docker-compose*
+.dockerignore
+
+# Git
+.git
+.gitignore
+.gitattributes
+
+# CI/CD
+.github/
+
+# 文件
+*.md
+README.md
+LICENSE
+
+# Node modules (如果有前端工具)
+node_modules/
+npm-debug.log
+yarn-error.log
