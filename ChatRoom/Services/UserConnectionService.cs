@@ -37,6 +37,11 @@ public class UserConnectionService
         return userInfo;
     }
 
+    public UserInfo? GetUserByNickname(string nickname)
+    {
+        return _connections.Values.FirstOrDefault(u => u.Nickname == nickname);
+    }
+
     public List<UserInfo> GetAllUsers()
     {
         return _connections.Values.ToList();

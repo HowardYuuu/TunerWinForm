@@ -217,6 +217,23 @@ body {
     margin: 0 auto;
 }
 
+/* 提及訊息 - 高亮背景 */
+.message.mentioned {
+    background-color: #FFF9E6;
+    padding: 5px;
+    border-radius: 8px;
+    border-left: 3px solid #FFD700;
+}
+
+/* @ 提及的用戶名高亮 */
+.mention {
+    background-color: #E3F2FD;
+    color: #1976D2;
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-weight: bold;
+}
+
 /* 輸入區域 */
 .input-area {
     display: flex;

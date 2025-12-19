@@ -68,13 +68,17 @@ public class ChatHub : Hub
             // 不需要在後端編碼，因為前端使用 textContent 來安全顯示
             var trimmedMessage = message.Trim();
 
+            // 解析 @ 提及
+            var mentionedUsers = ParseMentions(trimmedMessage);
+
             var chatMessage = new ChatMessage
             {
                 MessageId = Guid.NewGuid().ToString(),
                 Sender = userInfo.Nickname,
                 Content = trimmedMessage,
                 Timestamp = DateTime.Now,
-                Type = MessageType.Text
+                Type = MessageType.Text,
+                MentionedUsers = mentionedUsers
             };
 
             // 儲存訊息
@@ -86,7 +90,20 @@ public class ChatHub : Hub
                 chatMessage.Sender, 
                 chatMessage.Content, 
                 chatMessage.Timestamp,
-                chatMessage.Type.ToString());
+                chatMessage.Type.ToString(),
+                null, // imageData
+                chatMessage.MentionedUsers);
+            
+            // 通知被提及的用戶
+            foreach (var mentionedUser in mentionedUsers)
+            {
+                var mentionedUserInfo = _userConnectionService.GetUserByNickname(mentionedUser);
+                if (mentionedUserInfo != null && mentionedUserInfo.Nickname != userInfo.Nickname)
+                {
+                    await Clients.Client(mentionedUserInfo.ConnectionId)
+                        .SendAsync("UserMentioned", userInfo.Nickname, chatMessage.MessageId);
+                }
+            }
         }
         else
         {
@@ -119,7 +136,8 @@ public class ChatHub : Hub
                 chatMessage.Content, 
                 chatMessage.Timestamp,
                 chatMessage.Type.ToString(),
-                chatMessage.ImageData);
+                chatMessage.ImageData,
+                chatMessage.MentionedUsers);
         }
         else
         {
@@ -158,6 +176,30 @@ public class ChatHub : Hub
         }
 
         await base.OnDisconnectedAsync(exception);
+    }
+
+    private List<string> ParseMentions(string message)
+    {
+        var mentions = new List<string>();
+        var words = message.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        
+        foreach (var word in words)
+        {
+            if (word.StartsWith('@') && word.Length > 1)
+            {
+                // 移除 @ 符號並獲取用戶名稱
+                var username = word.Substring(1).TrimEnd(',', '.', '!', '?', ';', ':');
+                
+                // 驗證用戶是否存在
+                var user = _userConnectionService.GetUserByNickname(username);
+                if (user != null && !mentions.Contains(username))
+                {
+                    mentions.Add(username);
+                }
+            }
+        }
+        
+        return mentions;
     }
 
     private async Task HandleUserDisconnection(UserInfo userInfo)
