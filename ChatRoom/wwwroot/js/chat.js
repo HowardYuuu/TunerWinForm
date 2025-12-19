@@ -48,6 +48,10 @@ let mentionAutocomplete = {
 // Emoji 列表
 const emojis = ['😊', '😂', '😍', '🥰', '😎', '🤔', '😮', '😢', '😡', '👍', '👎', '👏', '🙏', '💪', '🎉', '❤️', '💯', '🔥', '⭐', '✨', '🌟', '💡', '📷', '🎵', '🎮', '⚽', '🍕', '🍔', '🎂', '☕', '🌈', '🌸'];
 
+// @ 提及相關常數
+const MENTION_PATTERN = /@([\w\u4e00-\u9fff]*)$/;
+const MENTION_SUFFIX_LENGTH = 2; // @ symbol + space
+
 // 初始化 SignalR 連線
 function initializeConnection() {
     connection = new signalR.HubConnectionBuilder()
@@ -587,7 +591,7 @@ function handleMentionAutocomplete(event) {
     const textBeforeCursor = input.value.substring(0, cursorPos);
     
     // 檢查是否在輸入 @
-    const atMatch = textBeforeCursor.match(/@([\w\u4e00-\u9fff]*)$/);
+    const atMatch = textBeforeCursor.match(MENTION_PATTERN);
     
     if (atMatch) {
         const searchTerm = atMatch[1].toLowerCase();
@@ -657,7 +661,7 @@ function selectMentionUser(username) {
     input.value = textBefore + '@' + username + ' ' + textAfter;
     
     // 設定游標位置
-    const newCursorPos = textBefore.length + username.length + 2; // +2 for @ and space
+    const newCursorPos = textBefore.length + username.length + MENTION_SUFFIX_LENGTH;
     input.setSelectionRange(newCursorPos, newCursorPos);
     
     hideMentionDropdown();
@@ -702,6 +706,12 @@ function handleMentionKeydown(event) {
     }
     
     return false;
+}
+
+// 檢查點擊是否在提及下拉選單外部
+function isClickOutsideMentionDropdown(target) {
+    const mentionDropdown = document.getElementById('mentionDropdown');
+    return mentionDropdown && !messageInput.contains(target) && !mentionDropdown.contains(target);
 }
 
 // 事件監聽器
@@ -755,8 +765,7 @@ document.addEventListener('DOMContentLoaded', () => {
             emojiPicker.style.display = 'none';
         }
         
-        const mentionDropdown = document.getElementById('mentionDropdown');
-        if (mentionDropdown && !messageInput.contains(e.target) && !mentionDropdown.contains(e.target)) {
+        if (isClickOutsideMentionDropdown(e.target)) {
             hideMentionDropdown();
         }
     });
