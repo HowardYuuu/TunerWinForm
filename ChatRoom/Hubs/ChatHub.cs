@@ -187,8 +187,8 @@ public class ChatHub : Hub
         {
             if (word.StartsWith('@') && word.Length > 1)
             {
-                // 移除 @ 符號並獲取用戶名稱
-                var username = word.Substring(1).TrimEnd(',', '.', '!', '?', ';', ':');
+                // 移除 @ 符號並清除末尾標點符號
+                var username = word.Substring(1).TrimEnd(',', '.', '!', '?', ';', ':', ')', ']', '}', '"', '\'', '>', '…');
                 
                 // 驗證用戶是否存在
                 var user = _userConnectionService.GetUserByNickname(username);

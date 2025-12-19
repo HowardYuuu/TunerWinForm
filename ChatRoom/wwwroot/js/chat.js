@@ -562,8 +562,8 @@ function showMentionNotification(mentioner) {
 
 // 高亮顯示 @ 提及
 function highlightMentions(text) {
-    // 使用正則表達式匹配 @username
-    return text.replace(/@(\w+)/g, '<span class="mention">@$1</span>');
+    // 使用正則表達式匹配 @username，支援中文字符
+    return text.replace(/@([\w\u4e00-\u9fff]+)/g, '<span class="mention">@$1</span>');
 }
 
 // 事件監聽器
