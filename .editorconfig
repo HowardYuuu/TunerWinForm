@@ -1,0 +1,13 @@
+# .editorconfig
+root = true
+
+[*.cs]
+
+# 1) 內建型別（int/string/...）也不要用 var
+csharp_style_var_for_built_in_types = false:warning
+
+# 2) 型別可明顯推斷也不要用 var
+csharp_style_var_when_type_is_apparent = false:warning
+
+# 3) 其他情境也不要用 var
+csharp_style_var_elsewhere = false:warning

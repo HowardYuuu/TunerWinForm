@@ -9,6 +9,7 @@ public class ChatMessage
     public MessageType Type { get; set; } = MessageType.Text;
     public string? ImageData { get; set; }
     public HashSet<string> ReadBy { get; set; } = new();
+    public List<string> MentionedUsers { get; set; } = new();
 }
 
 public enum MessageType
