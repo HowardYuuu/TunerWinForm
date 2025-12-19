@@ -34,6 +34,17 @@ const cancelPreviewBtn = document.getElementById('cancelPreviewBtn');
 // 當前預覽的圖片數據
 let currentImageData = null;
 
+// 在線用戶列表（用於 @ 提及自動完成）
+let onlineUsers = [];
+
+// @ 提及自動完成狀態
+let mentionAutocomplete = {
+    isActive: false,
+    startPosition: -1,
+    selectedIndex: -1,
+    filteredUsers: []
+};
+
 // Emoji 列表
 const emojis = ['😊', '😂', '😍', '🥰', '😎', '🤔', '😮', '😢', '😡', '👍', '👎', '👏', '🙏', '💪', '🎉', '❤️', '💯', '🔥', '⭐', '✨', '🌟', '💡', '📷', '🎵', '🎮', '⚽', '🍕', '🍔', '🎂', '☕', '🌈', '🌸'];
 
@@ -303,6 +314,9 @@ function addSystemMessage(message) {
 function updateUsersList(users) {
     usersList.innerHTML = '';
     
+    // 儲存在線用戶列表供 @ 提及使用
+    onlineUsers = users.map(u => u.nickname);
+    
     users.forEach(user => {
         const li = document.createElement('li');
         li.className = 'user-item';
@@ -566,6 +580,130 @@ function highlightMentions(text) {
     return text.replace(/@([\w\u4e00-\u9fff]+)/g, '<span class="mention">@$1</span>');
 }
 
+// 處理 @ 提及自動完成
+function handleMentionAutocomplete(event) {
+    const input = messageInput;
+    const cursorPos = input.selectionStart;
+    const textBeforeCursor = input.value.substring(0, cursorPos);
+    
+    // 檢查是否在輸入 @
+    const atMatch = textBeforeCursor.match(/@([\w\u4e00-\u9fff]*)$/);
+    
+    if (atMatch) {
+        const searchTerm = atMatch[1].toLowerCase();
+        mentionAutocomplete.startPosition = cursorPos - atMatch[0].length;
+        
+        // 過濾符合的用戶（排除自己）
+        mentionAutocomplete.filteredUsers = onlineUsers
+            .filter(user => user !== currentUser && user.toLowerCase().includes(searchTerm));
+        
+        if (mentionAutocomplete.filteredUsers.length > 0) {
+            mentionAutocomplete.isActive = true;
+            mentionAutocomplete.selectedIndex = 0;
+            showMentionDropdown();
+        } else {
+            hideMentionDropdown();
+        }
+    } else {
+        hideMentionDropdown();
+    }
+}
+
+// 顯示 @ 提及下拉選單
+function showMentionDropdown() {
+    let dropdown = document.getElementById('mentionDropdown');
+    
+    if (!dropdown) {
+        dropdown = document.createElement('div');
+        dropdown.id = 'mentionDropdown';
+        dropdown.className = 'mention-dropdown';
+        document.querySelector('.input-area').appendChild(dropdown);
+    }
+    
+    dropdown.innerHTML = '';
+    
+    mentionAutocomplete.filteredUsers.forEach((user, index) => {
+        const item = document.createElement('div');
+        item.className = 'mention-item';
+        if (index === mentionAutocomplete.selectedIndex) {
+            item.classList.add('selected');
+        }
+        item.textContent = user;
+        item.onclick = () => selectMentionUser(user);
+        dropdown.appendChild(item);
+    });
+    
+    dropdown.style.display = 'block';
+}
+
+// 隱藏 @ 提及下拉選單
+function hideMentionDropdown() {
+    mentionAutocomplete.isActive = false;
+    mentionAutocomplete.selectedIndex = -1;
+    const dropdown = document.getElementById('mentionDropdown');
+    if (dropdown) {
+        dropdown.style.display = 'none';
+    }
+}
+
+// 選擇提及的用戶
+function selectMentionUser(username) {
+    const input = messageInput;
+    const cursorPos = input.selectionStart;
+    const textBefore = input.value.substring(0, mentionAutocomplete.startPosition);
+    const textAfter = input.value.substring(cursorPos);
+    
+    // 插入選中的用戶名
+    input.value = textBefore + '@' + username + ' ' + textAfter;
+    
+    // 設定游標位置
+    const newCursorPos = textBefore.length + username.length + 2; // +2 for @ and space
+    input.setSelectionRange(newCursorPos, newCursorPos);
+    
+    hideMentionDropdown();
+    input.focus();
+}
+
+// 處理提及下拉選單的鍵盤導航
+function handleMentionKeydown(event) {
+    if (!mentionAutocomplete.isActive) {
+        return false;
+    }
+    
+    switch(event.key) {
+        case 'ArrowDown':
+            event.preventDefault();
+            mentionAutocomplete.selectedIndex = 
+                (mentionAutocomplete.selectedIndex + 1) % mentionAutocomplete.filteredUsers.length;
+            showMentionDropdown();
+            return true;
+            
+        case 'ArrowUp':
+            event.preventDefault();
+            mentionAutocomplete.selectedIndex = 
+                (mentionAutocomplete.selectedIndex - 1 + mentionAutocomplete.filteredUsers.length) 
+                % mentionAutocomplete.filteredUsers.length;
+            showMentionDropdown();
+            return true;
+            
+        case 'Tab':
+        case 'Enter':
+            if (mentionAutocomplete.filteredUsers.length > 0) {
+                event.preventDefault();
+                selectMentionUser(mentionAutocomplete.filteredUsers[mentionAutocomplete.selectedIndex]);
+                return true;
+            }
+            break;
+            
+        case 'Escape':
+            event.preventDefault();
+            hideMentionDropdown();
+            return true;
+    }
+    
+    return false;
+}
+
 // 事件監聽器
 document.addEventListener('DOMContentLoaded', () => {
     // 初始化連線
@@ -587,12 +725,21 @@ document.addEventListener('DOMContentLoaded', () => {
     // 發送按鈕
     sendBtn.addEventListener('click', sendMessage);
 
-    // Enter 鍵發送訊息
-    messageInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
+    // Enter 鍵發送訊息（但先檢查是否在選擇提及）
+    messageInput.addEventListener('keydown', (e) => {
+        // 處理提及下拉選單的鍵盤導航
+        if (handleMentionKeydown(e)) {
+            return;
+        }
+        
+        if (e.key === 'Enter' && !mentionAutocomplete.isActive) {
+            e.preventDefault();
             sendMessage();
         }
     });
+    
+    // 監聽輸入以觸發 @ 提及自動完成
+    messageInput.addEventListener('input', handleMentionAutocomplete);
 
     // 貼上圖片
     messageInput.addEventListener('paste', handlePaste);
@@ -602,10 +749,15 @@ document.addEventListener('DOMContentLoaded', () => {
         emojiPicker.style.display = emojiPicker.style.display === 'none' ? 'block' : 'none';
     });
 
-    // 點擊其他地方關閉 Emoji 選擇器
+    // 點擊其他地方關閉 Emoji 選擇器和提及下拉選單
     document.addEventListener('click', (e) => {
         if (!emojiBtn.contains(e.target) && !emojiPicker.contains(e.target)) {
             emojiPicker.style.display = 'none';
+        }
+        
+        const mentionDropdown = document.getElementById('mentionDropdown');
+        if (mentionDropdown && !messageInput.contains(e.target) && !mentionDropdown.contains(e.target)) {
+            hideMentionDropdown();
         }
     });
 

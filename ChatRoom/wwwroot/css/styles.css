@@ -376,6 +376,43 @@ body {
     background: #f0f0f0;
 }
 
+/* @ 提及自動完成下拉選單 */
+.mention-dropdown {
+    position: absolute;
+    bottom: 70px;
+    left: 20px;
+    background: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 1001;
+    min-width: 200px;
+    display: none;
+}
+
+.mention-item {
+    padding: 10px 15px;
+    cursor: pointer;
+    transition: background 0.2s;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.mention-item:last-child {
+    border-bottom: none;
+}
+
+.mention-item:hover {
+    background: #f5f7fa;
+}
+
+.mention-item.selected {
+    background: #E3F2FD;
+    color: #1976D2;
+    font-weight: 500;
+}
+
 /* 側邊欄 */
 .sidebar {
     width: 300px;
